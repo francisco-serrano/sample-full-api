@@ -1,6 +1,7 @@
-package main
+package utils
 
 import (
+	"github.com/sample-full-api/models"
 	"sort"
 )
 
@@ -33,7 +34,7 @@ func AlignedWithSun(points ...*models.Point) bool {
 }
 
 func alignedWithSun(a, b *models.Point) bool {
-	return a == b || (a.Degrees+180.0 == b.Degrees) || (a.Degrees == b.Degrees+180.0)
+	return a.Degrees == b.Degrees || (a.Degrees+180.0 == b.Degrees) || (a.Degrees == b.Degrees+180.0)
 }
 
 // polygon must be convex
