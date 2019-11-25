@@ -7,14 +7,12 @@ import (
 	"strings"
 )
 
-func AmountDroughts(days int) {
+func AmountDroughts(days int, logSituations bool) {
 	ferengi, _ := models.NewPoint(500, 0, 1, true)
 	betasoide, _ := models.NewPoint(2000, 0, 3, true)
 	vulcano, _ := models.NewPoint(1000, 0, 5, false)
 
 	solarSystem := []*models.Point{ferengi, betasoide, vulcano}
-
-	fmt.Printf("analyzing droughts in the following %d days\n", days)
 
 	amountAlignments := 0
 	for day := 0; day < days; day++ {
@@ -24,10 +22,13 @@ func AmountDroughts(days int) {
 				positions = append(positions, fmt.Sprintf("%v", planet.Degrees))
 			}
 
-			fmt.Printf("drought detected at day %v\t\tpositions %s\n",
-				day,
-				strings.Join(positions, ";"),
-			)
+			if logSituations {
+				fmt.Printf("drought detected at day %v\t\tpositions %s\n",
+					day,
+					strings.Join(positions, ";"),
+				)
+			}
+
 			amountAlignments += 1
 		}
 

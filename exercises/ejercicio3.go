@@ -7,36 +7,29 @@ import (
 	"strings"
 )
 
-func AmountRainyPeriods(days int, logSituations bool) {
+func AmountOptimalConditions(days int, logSituations bool) {
 	ferengi, _ := models.NewPoint(500, 45, 1, true)
 	betasoide, _ := models.NewPoint(2000, 270, 3, true)
 	vulcano, _ := models.NewPoint(1000, 135, 5, false)
 
 	planets := []*models.Point{ferengi, betasoide, vulcano}
 
-	sun, _ := models.NewPoint(0, 0, 0, false)
-
-	amountRains, maxPerimeter, maxPerimeterDay := 0, 0.0, 0
+	amount := 0
 	for day := 0; day < days; day++ {
-		if utils.WithinPolygon(sun, planets...) {
+		if utils.AlignedWithoutSun(planets...) && !utils.AlignedWithSun(planets...) {
 			var positions []string
 			for _, planet := range planets {
 				positions = append(positions, fmt.Sprintf("r=%v, %v°", planet.R, planet.Degrees))
 			}
 
-			if perimeter := utils.Perimeter(planets...); perimeter > maxPerimeter {
-				maxPerimeter = perimeter
-				maxPerimeterDay = day
-			}
-
 			if logSituations {
-				fmt.Printf("rainy period at day %v\t\t%s\n",
+				fmt.Printf("optimal condition detected at day %d with positions %s\n",
 					day,
 					strings.Join(positions, "\t"),
 				)
 			}
 
-			amountRains += 1
+			amount += 1
 		}
 
 		for _, planet := range planets {
@@ -44,6 +37,5 @@ func AmountRainyPeriods(days int, logSituations bool) {
 		}
 	}
 
-	fmt.Printf("amount of rainy periods %d\n", amountRains)
-	fmt.Printf("max peak of rains at day %d\n", maxPerimeterDay)
+	fmt.Printf("amount of optimal conditions %d\n", amount)
 }
