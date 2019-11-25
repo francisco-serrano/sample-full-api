@@ -2,6 +2,7 @@ package utils
 
 import (
 	"github.com/sample-full-api/models"
+	"math"
 	"sort"
 )
 
@@ -65,4 +66,27 @@ func WithinPolygon(target *models.Point, polygon ...*models.Point) bool {
 
 func Determinant(a, b, target *models.Point) float64 {
 	return (b.X-a.X)*(target.Y-a.Y) - (b.Y-a.Y)*(target.X-a.X)
+}
+
+func Perimeter(polygon ...*models.Point) float64 {
+	if len(polygon) < 2 {
+		return 0
+	}
+
+	if len(polygon) == 2 {
+		return distance(polygon[0], polygon[1])
+	}
+
+	perimeter := 0.0
+	for i := 0; i < len(polygon)-1; i++ {
+		perimeter += distance(polygon[i], polygon[i+1])
+	}
+
+	perimeter += distance(polygon[len(polygon)-1], polygon[0])
+
+	return perimeter
+}
+
+func distance(a, b *models.Point) float64 {
+	return math.Sqrt(math.Pow(b.X-a.X, 2) + math.Pow(b.Y-a.Y, 2))
 }

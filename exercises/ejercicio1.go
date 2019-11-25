@@ -18,21 +18,21 @@ func AmountDroughts(days int) {
 
 	amountAlignments := 0
 	for day := 0; day < days; day++ {
-		for _, planet := range solarSystem {
-			planet.AdvanceDay()
-		}
-
 		if utils.AlignedWithSun(solarSystem...) {
 			var positions []string
 			for _, planet := range solarSystem {
 				positions = append(positions, fmt.Sprintf("%v", planet.Degrees))
 			}
 
-			fmt.Printf("drought detected - day %v\t\tpositions %s\n",
+			fmt.Printf("drought detected at day %v\t\tpositions %s\n",
 				day,
-				strings.Join(positions, ","),
+				strings.Join(positions, ";"),
 			)
 			amountAlignments += 1
+		}
+
+		for _, planet := range solarSystem {
+			planet.AdvanceDay()
 		}
 	}
 

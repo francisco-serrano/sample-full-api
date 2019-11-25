@@ -6,7 +6,7 @@ import (
 )
 
 type Point struct {
-	r         float64
+	R         float64
 	Degrees   float64
 	radians   float64
 	X         float64
@@ -23,7 +23,7 @@ func NewPoint(r, degrees, speed float64, clockwise bool) (*Point, error) {
 	radians := degrees * (math.Pi / 180.0)
 
 	return &Point{
-		r:         r,
+		R:         r,
 		Degrees:   degrees,
 		radians:   radians,
 		X:         math.Round(r*math.Cos(radians)*100) / 100,
@@ -42,6 +42,10 @@ func (p *Point) AdvanceDay() {
 		}
 
 		p.Degrees = newPosition
+		p.radians = newPosition * (math.Pi / 180.0)
+		p.X = math.Round(p.R*math.Cos(p.radians)*100) / 100
+		p.X = math.Round(p.R*math.Sin(p.radians)*100) / 100
+
 		return
 	}
 
@@ -52,4 +56,7 @@ func (p *Point) AdvanceDay() {
 	}
 
 	p.Degrees = newPosition
+	p.radians = newPosition * (math.Pi / 180.0)
+	p.X = math.Round(p.R*math.Cos(p.radians)*100) / 100
+	p.X = math.Round(p.R*math.Sin(p.radians)*100) / 100
 }

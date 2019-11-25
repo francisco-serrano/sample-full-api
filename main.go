@@ -4,6 +4,14 @@ import "github.com/sample-full-api/exercises"
 
 func main() {
 	exercises.AmountDroughts(365 * 10)
+	exercises.AmountRainyPeriods(365 * 10)
+
+	//ferengi, _ := models.NewPoint(500, 45, 1, true)
+	//betasoide, _ := models.NewPoint(2000, 270, 3, true)
+	//vulcano, _ := models.NewPoint(1000, 135, 5, false)
+	//
+	//fmt.Println("perimeter", utils.Perimeter(ferengi, betasoide, vulcano))
+
 	//a, _ := models.NewPoint(10, 90)
 	//b, _ := models.NewPoint(20, 270)
 	//c, _ := models.NewPoint(18, 0)
