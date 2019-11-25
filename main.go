@@ -22,10 +22,6 @@ func obtainDbConnection() *gorm.DB {
 }
 
 func main() {
-	//exercises.AmountDroughts(365*10, false)
-	//exercises.AmountRainyPeriods(365*10, false)
-	//exercises.AmountOptimalConditions(365*10, false)
-
 	db := obtainDbConnection()
 	router := routers.ObtainRoutes(db)
 

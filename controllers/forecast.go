@@ -6,6 +6,7 @@ import (
 	"github.com/sample-full-api/services"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 )
 
 type ForecastController struct {
@@ -49,8 +50,15 @@ func (f *ForecastController) AddPlanet(ctx *gin.Context) {
 }
 
 func (f *ForecastController) GenerateForecasts(ctx *gin.Context) {
+	solarSystemId, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		panic(err)
+	}
+
+	result := f.ServiceFactory().GenerateForecasts(solarSystemId)
+
 	ctx.JSON(http.StatusOK, gin.H{
-		"msg": "job triggered",
+		"result": result,
 	})
 }
 

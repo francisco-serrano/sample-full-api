@@ -2,7 +2,9 @@ package services
 
 import (
 	"errors"
+	"fmt"
 	"github.com/jinzhu/gorm"
+	"github.com/sample-full-api/exercises"
 	"github.com/sample-full-api/models"
 	"math"
 )
@@ -41,6 +43,12 @@ func (p *PlanetService) AddSolarSystem(request *AddSolarSystemRequest) *models.S
 	return solarSystem
 }
 
+func (p *PlanetService) GenerateForecasts(solarSystemId int) string {
+	go p.generateForecast(solarSystemId)
+
+	return fmt.Sprintf("job triggered for system %d", solarSystemId)
+}
+
 func (p *PlanetService) buildPlanet(req *AddPlanetRequest) (*models.Planet, error) {
 	if req.Radio < 0.0 || req.InitialDegrees < 0.0 || req.InitialDegrees >= 360.0 {
 		return nil, errors.New("invalid input data")
@@ -65,6 +73,26 @@ func (p *PlanetService) buildSolarSystem(req *AddSolarSystemRequest) (*models.So
 	return &models.SolarSystem{
 		Name: req.Name,
 	}, nil
+}
+
+// goroutine
+func (p *PlanetService) generateForecast(solarSystemId int) {
+	exercises.AmountDroughts(365*10, false)
+	exercises.AmountRainyPeriods(365*10, false)
+	exercises.AmountOptimalConditions(365*10, false)
+
+	if solarSystemId < 0 {
+		panic("solar system cannot be negative")
+	}
+
+	var planets []models.Planet
+	if err := p.db.Where(&models.Planet{SolarSystemID: uint(solarSystemId)}).Find(&planets).Error; err != nil {
+		panic(err)
+	}
+
+	for _, planet := range planets {
+		fmt.Printf("%+v\n", planet)
+	}
 }
 
 // ----- VIEWS -----

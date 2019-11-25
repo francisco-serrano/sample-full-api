@@ -19,7 +19,7 @@ func ObtainRoutes(db *gorm.DB) *gin.Engine {
 	router.POST("/planets", planetController.AddPlanet)
 	router.POST("/solar_system", planetController.AddSolarSystem)
 
-	router.POST("/planets/generate_forecasts", planetController.GenerateForecasts)
+	router.POST("/solar_system/:id/generate_forecasts", planetController.GenerateForecasts)
 
 	router.GET("/planets/forecast", planetController.ObtainForecast)
 
