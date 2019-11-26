@@ -8,6 +8,7 @@ import (
 	"github.com/sample-full-api/routers"
 	"github.com/sample-full-api/services"
 	"math"
+	"time"
 )
 
 func obtainDbConnection() *gorm.DB {
@@ -19,6 +20,10 @@ func obtainDbConnection() *gorm.DB {
 	db.AutoMigrate(&models.SolarSystem{}, &models.Planet{}, &models.DayForecast{})
 	db.Model(&models.DayForecast{}).AddForeignKey("solar_system_id", "solar_systems(id)", "RESTRICT", "RESTRICT")
 	db.Model(&models.Planet{}).AddForeignKey("solar_system_id", "solar_systems(id)", "RESTRICT", "RESTRICT")
+
+	db.DB().SetMaxIdleConns(10)
+	db.DB().SetMaxOpenConns(100)
+	db.DB().SetConnMaxLifetime(time.Hour)
 
 	return db
 }
