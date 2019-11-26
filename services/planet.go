@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/sample-full-api/exercises"
 	"github.com/sample-full-api/models"
@@ -49,6 +50,18 @@ func (p *PlanetService) GenerateForecasts(solarSystemId, daysAmount int) string 
 	go p.generateForecast(solarSystemId, daysAmount)
 
 	return fmt.Sprintf("job triggered for system %d", solarSystemId)
+}
+
+func (p *PlanetService) ObtainForecast(day int) gin.H {
+	var forecast models.DayForecast
+	if err := p.db.First(&forecast, day).Error; err != nil {
+		panic(err)
+	}
+
+	return gin.H{
+		"day":      day,
+		"forecast": forecast,
+	}
 }
 
 func (p *PlanetService) buildSolarSystem(req *AddSolarSystemRequest) (*models.SolarSystem, error) {

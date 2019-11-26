@@ -68,14 +68,14 @@ func (f *ForecastController) GenerateForecasts(ctx *gin.Context) {
 }
 
 func (f *ForecastController) ObtainForecast(ctx *gin.Context) {
-	day := ctx.Request.URL.Query().Get("day")
-
-	if day == "" {
-		panic("invalid day")
+	day, err := strconv.Atoi(ctx.Query("day"))
+	if err != nil {
+		panic(err)
 	}
 
+	result := f.ServiceFactory().ObtainForecast(day)
+
 	ctx.JSON(http.StatusOK, gin.H{
-		"day":      day,
-		"forecast": "rain",
+		"result": result,
 	})
 }
