@@ -55,7 +55,12 @@ func (f *ForecastController) GenerateForecasts(ctx *gin.Context) {
 		panic(err)
 	}
 
-	result := f.ServiceFactory().GenerateForecasts(solarSystemId)
+	daysAmount, err := strconv.Atoi(ctx.Query("days"))
+	if err != nil {
+		panic(err)
+	}
+
+	result := f.ServiceFactory().GenerateForecasts(solarSystemId, daysAmount)
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"result": result,

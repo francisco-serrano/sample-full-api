@@ -105,6 +105,12 @@
 			"revisionTime": "2018-07-18T01:23:57Z"
 		},
 		{
+			"checksumSHA1": "la1Lj2S+7P51e/aVBYn1Yw9u6T8=",
+			"path": "github.com/t-tiger/gorm-bulk-insert",
+			"revision": "4d86045d33b6b5a0e637b3759454282a48c73897",
+			"revisionTime": "2019-11-24T08:26:01Z"
+		},
+		{
 			"checksumSHA1": "tUybPhSS6kQxGMa6rmzF11EcnkE=",
 			"path": "github.com/ugorji/go/codec",
 			"revision": "42bc974514ff101a54c6b72a0e4dee29d96c0b26",

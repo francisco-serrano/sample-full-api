@@ -6,7 +6,7 @@ import (
 	"sort"
 )
 
-func AlignedWithoutSun(points ...*models.Point) bool {
+func AlignedWithoutSun(points ...models.Planet) bool {
 	if len(points) < 3 {
 		return true
 	}
@@ -20,13 +20,13 @@ func AlignedWithoutSun(points ...*models.Point) bool {
 	return true
 }
 
-func AlignedWithSun(points ...*models.Point) bool {
-	if len(points) < 3 {
-		return alignedWithSun(points[0], points[1])
+func AlignedWithSun(planets ...models.Planet) bool {
+	if len(planets) < 3 {
+		return alignedWithSun(planets[0], planets[1])
 	}
 
-	for i := 0; i < len(points)-1; i++ {
-		if !alignedWithSun(points[i], points[i+1]) {
+	for i := 0; i < len(planets)-1; i++ {
+		if !alignedWithSun(planets[i], planets[i+1]) {
 			return false
 		}
 	}
@@ -34,17 +34,17 @@ func AlignedWithSun(points ...*models.Point) bool {
 	return true
 }
 
-func alignedWithSun(a, b *models.Point) bool {
+func alignedWithSun(a, b models.Planet) bool {
 	return a.Degrees == b.Degrees || (a.Degrees+180.0 == b.Degrees) || (a.Degrees == b.Degrees+180.0)
 }
 
 // polygon must be convex
-func WithinPolygon(target *models.Point, polygon ...*models.Point) bool {
+func WithinPolygon(target models.Planet, polygon ...models.Planet) bool {
 	if len(polygon) < 3 {
 		return false
 	}
 
-	sortedPolygon := make([]*models.Point, len(polygon))
+	sortedPolygon := make([]models.Planet, len(polygon))
 	copy(sortedPolygon, polygon)
 
 	sort.Slice(sortedPolygon, func(i, j int) bool {
@@ -64,11 +64,11 @@ func WithinPolygon(target *models.Point, polygon ...*models.Point) bool {
 	return true
 }
 
-func Determinant(a, b, target *models.Point) float64 {
+func Determinant(a, b, target models.Planet) float64 {
 	return (b.X-a.X)*(target.Y-a.Y) - (b.Y-a.Y)*(target.X-a.X)
 }
 
-func Perimeter(polygon ...*models.Point) float64 {
+func Perimeter(polygon ...models.Planet) float64 {
 	if len(polygon) < 2 {
 		return 0
 	}
@@ -87,6 +87,6 @@ func Perimeter(polygon ...*models.Point) float64 {
 	return perimeter
 }
 
-func distance(a, b *models.Point) float64 {
+func distance(a, b models.Planet) float64 {
 	return math.Sqrt(math.Pow(b.X-a.X, 2) + math.Pow(b.Y-a.Y, 2))
 }

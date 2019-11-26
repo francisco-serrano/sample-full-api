@@ -7,14 +7,27 @@ import (
 	"strings"
 )
 
-func AmountRainyPeriods(days int, logSituations bool) {
-	ferengi, _ := models.NewPoint(500, 45, 1, true)
-	betasoide, _ := models.NewPoint(2000, 270, 3, true)
-	vulcano, _ := models.NewPoint(1000, 135, 5, false)
+func AmountRainyPeriods(days int, logSituations bool, srcPlanets ...models.Planet) {
+	//ferengi, _ := models.NewPoint(500, 45, 1, true)
+	//betasoide, _ := models.NewPoint(2000, 270, 3, true)
+	//vulcano, _ := models.NewPoint(1000, 135, 5, false)
+	//
+	//planets := []*models.Point{ferengi, betasoide, vulcano}
 
-	planets := []*models.Point{ferengi, betasoide, vulcano}
+	//sun, _ := models.NewPoint(0, 0, 0, false)
+	planets := make([]models.Planet, len(srcPlanets))
+	copy(planets, srcPlanets)
 
-	sun, _ := models.NewPoint(0, 0, 0, false)
+	sun := models.Planet{
+		Name:      "sun",
+		R:         0,
+		Degrees:   0,
+		Speed:     0,
+		Clockwise: false,
+		Radians:   0,
+		X:         0,
+		Y:         0,
+	}
 
 	amountRains, maxPerimeter, maxPerimeterDay := 0, 0.0, 0
 	for day := 0; day < days; day++ {
@@ -39,8 +52,8 @@ func AmountRainyPeriods(days int, logSituations bool) {
 			amountRains += 1
 		}
 
-		for _, planet := range planets {
-			planet.AdvanceDay()
+		for i := 0; i < len(planets); i++ {
+			planets[i].AdvanceDay()
 		}
 	}
 

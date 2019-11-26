@@ -7,12 +7,15 @@ import (
 	"strings"
 )
 
-func AmountOptimalConditions(days int, logSituations bool) {
-	ferengi, _ := models.NewPoint(500, 45, 1, true)
-	betasoide, _ := models.NewPoint(2000, 270, 3, true)
-	vulcano, _ := models.NewPoint(1000, 135, 5, false)
+func AmountOptimalConditions(days int, logSituations bool, srcPlanets ...models.Planet) {
+	//ferengi, _ := models.NewPoint(500, 45, 1, true)
+	//betasoide, _ := models.NewPoint(2000, 270, 3, true)
+	//vulcano, _ := models.NewPoint(1000, 135, 5, false)
+	//
+	//planets := []*models.Point{ferengi, betasoide, vulcano}
 
-	planets := []*models.Point{ferengi, betasoide, vulcano}
+	planets := make([]models.Planet, len(srcPlanets))
+	copy(planets, srcPlanets)
 
 	amount := 0
 	for day := 0; day < days; day++ {
@@ -32,8 +35,8 @@ func AmountOptimalConditions(days int, logSituations bool) {
 			amount += 1
 		}
 
-		for _, planet := range planets {
-			planet.AdvanceDay()
+		for i := 0; i < len(planets); i++ {
+			planets[i].AdvanceDay()
 		}
 	}
 

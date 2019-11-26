@@ -6,7 +6,9 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/sample-full-api/exercises"
 	"github.com/sample-full-api/models"
+	gormbulk "github.com/t-tiger/gorm-bulk-insert"
 	"math"
+	"time"
 )
 
 type PlanetService struct {
@@ -43,10 +45,16 @@ func (p *PlanetService) AddSolarSystem(request *AddSolarSystemRequest) *models.S
 	return solarSystem
 }
 
-func (p *PlanetService) GenerateForecasts(solarSystemId int) string {
-	go p.generateForecast(solarSystemId)
+func (p *PlanetService) GenerateForecasts(solarSystemId, daysAmount int) string {
+	go p.generateForecast(solarSystemId, daysAmount)
 
 	return fmt.Sprintf("job triggered for system %d", solarSystemId)
+}
+
+func (p *PlanetService) buildSolarSystem(req *AddSolarSystemRequest) (*models.SolarSystem, error) {
+	return &models.SolarSystem{
+		Name: req.Name,
+	}, nil
 }
 
 func (p *PlanetService) buildPlanet(req *AddPlanetRequest) (*models.Planet, error) {
@@ -69,24 +77,32 @@ func (p *PlanetService) buildPlanet(req *AddPlanetRequest) (*models.Planet, erro
 	}, nil
 }
 
-func (p *PlanetService) buildSolarSystem(req *AddSolarSystemRequest) (*models.SolarSystem, error) {
-	return &models.SolarSystem{
-		Name: req.Name,
-	}, nil
-}
-
 // goroutine
-func (p *PlanetService) generateForecast(solarSystemId int) {
-	exercises.AmountDroughts(365*10, false)
-	exercises.AmountRainyPeriods(365*10, false)
-	exercises.AmountOptimalConditions(365*10, false)
+func (p *PlanetService) generateForecast(solarSystemId, daysAmount int) {
+	time.Sleep(1 * time.Second)
 
 	if solarSystemId < 0 {
 		panic("solar system cannot be negative")
 	}
 
+	fmt.Printf("generating forecast for system %d for %d days\n", solarSystemId, daysAmount)
+
 	var planets []models.Planet
 	if err := p.db.Where(&models.Planet{SolarSystemID: uint(solarSystemId)}).Find(&planets).Error; err != nil {
+		panic(err)
+	}
+
+	aux1 := make([]models.Planet, len(planets))
+	copy(aux1, planets)
+
+	forecasts := exercises.AnalyzeDays(daysAmount, false, solarSystemId, aux1...)
+	fmt.Println("len(forecasts)", len(forecasts))
+
+	//if err := p.db.Create(&forecasts).Error; err != nil {
+	//	panic(err)
+	//}
+
+	if err := gormbulk.BulkInsert(p.db, forecasts, 2000); err != nil {
 		panic(err)
 	}
 

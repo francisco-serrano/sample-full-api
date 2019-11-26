@@ -7,18 +7,21 @@ import (
 	"strings"
 )
 
-func AmountDroughts(days int, logSituations bool) {
-	ferengi, _ := models.NewPoint(500, 0, 1, true)
-	betasoide, _ := models.NewPoint(2000, 0, 3, true)
-	vulcano, _ := models.NewPoint(1000, 0, 5, false)
+func AmountDroughts(days int, logSituations bool, srcPlanets ...models.Planet) {
+	//ferengi, _ := models.NewPoint(500, 0, 1, true)
+	//betasoide, _ := models.NewPoint(2000, 0, 3, true)
+	//vulcano, _ := models.NewPoint(1000, 0, 5, false)
+	//
+	//solarSystem := []*models.Point{ferengi, betasoide, vulcano}
 
-	solarSystem := []*models.Point{ferengi, betasoide, vulcano}
+	planets := make([]models.Planet, len(srcPlanets))
+	copy(planets, srcPlanets)
 
 	amountAlignments := 0
 	for day := 0; day < days; day++ {
-		if utils.AlignedWithSun(solarSystem...) {
+		if utils.AlignedWithSun(planets...) {
 			var positions []string
-			for _, planet := range solarSystem {
+			for _, planet := range planets {
 				positions = append(positions, fmt.Sprintf("%v", planet.Degrees))
 			}
 
@@ -32,8 +35,8 @@ func AmountDroughts(days int, logSituations bool) {
 			amountAlignments += 1
 		}
 
-		for _, planet := range solarSystem {
-			planet.AdvanceDay()
+		for i := 0; i < len(planets); i++ {
+			planets[i].AdvanceDay()
 		}
 	}
 
