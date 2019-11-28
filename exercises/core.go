@@ -7,7 +7,14 @@ import (
 	"strings"
 )
 
-func AnalyzeDays(days int, logSituations bool, solarSystemID int, srcPlanets ...models.Planet) []interface{} {
+type AnalysisResult struct {
+	Droughts          int64
+	RainyPeriods      int64
+	MaxPeak           int64
+	OptimalConditions int64
+}
+
+func AnalyzeDays(days int, logSituations bool, solarSystemID int, srcPlanets ...models.Planet) ([]interface{}, AnalysisResult) {
 	var forecasts []interface{}
 
 	planets := make([]models.Planet, len(srcPlanets))
@@ -100,10 +107,12 @@ func AnalyzeDays(days int, logSituations bool, solarSystemID int, srcPlanets ...
 		}
 	}
 
-	fmt.Printf("amount of droughts %d\n", amountAlignments)
-	fmt.Printf("amount of rainy periods %d\n", amountRains)
-	fmt.Printf("max peak of rains at day %d\n", maxPerimeterDay)
-	fmt.Printf("amount of optimal conditions %d\n", amount)
+	result := AnalysisResult{
+		Droughts:          int64(amountAlignments),
+		RainyPeriods:      int64(amountRains),
+		MaxPeak:           int64(maxPerimeterDay),
+		OptimalConditions: int64(amount),
+	}
 
-	return forecasts
+	return forecasts, result
 }

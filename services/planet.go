@@ -54,7 +54,10 @@ func (p *PlanetService) GenerateForecasts(solarSystemId, daysAmount int) string 
 
 func (p *PlanetService) ObtainForecast(day int) gin.H {
 	var forecast models.DayForecast
-	if err := p.db.First(&forecast, day).Error; err != nil {
+	forecast.Day = day
+	forecast.DeletedAt = nil
+
+	if err := p.db.First(&forecast).Error; err != nil {
 		panic(err)
 	}
 
@@ -108,19 +111,23 @@ func (p *PlanetService) generateForecast(solarSystemId, daysAmount int) {
 	aux1 := make([]models.Planet, len(planets))
 	copy(aux1, planets)
 
-	forecasts := exercises.AnalyzeDays(daysAmount, false, solarSystemId, aux1...)
-	fmt.Println("len(forecasts)", len(forecasts))
+	forecasts, result := exercises.AnalyzeDays(daysAmount, false, solarSystemId, aux1...)
 
-	//if err := p.db.Create(&forecasts).Error; err != nil {
-	//	panic(err)
-	//}
+	fmt.Printf("analysis result %+v\n", result)
 
-	if err := gormbulk.BulkInsert(p.db, forecasts, 2000); err != nil {
+	var existingForecasts []models.DayForecast
+	if err := p.db.Find(&existingForecasts, "solar_system_id = ?", solarSystemId).Error; err != nil {
 		panic(err)
 	}
 
-	for _, planet := range planets {
-		fmt.Printf("%+v\n", planet)
+	fmt.Println("AAAAAAAAAAAAAAA", len(existingForecasts))
+
+	if err := p.db.Delete(&existingForecasts).Error; err != nil {
+		panic(err)
+	}
+
+	if err := gormbulk.BulkInsert(p.db, forecasts, 2000); err != nil {
+		panic(err)
 	}
 }
 
