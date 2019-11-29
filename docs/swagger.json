@@ -1,0 +1,207 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {},
+        "license": {}
+    },
+    "paths": {
+        "/planets": {
+            "get": {
+                "description": "Gets all added planets",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/views.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/views.BaseResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Adds a planet into the database",
+                "parameters": [
+                    {
+                        "description": "Add Planet Request",
+                        "name": "message",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/views.AddPlanetRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/views.BaseResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/views.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/views.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/planets/forecast": {
+            "get": {
+                "description": "Obtains a previously generated forecast",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/views.BaseResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/views.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/views.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/solar_systems": {
+            "get": {
+                "description": "Gets all added solar systems",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/views.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/views.BaseResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Adds a solar system into the database",
+                "parameters": [
+                    {
+                        "description": "Add Solar System Request",
+                        "name": "message",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/views.AddSolarSystemRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/views.BaseResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/views.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/views.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/solar_systems/": {
+            "post": {
+                "description": "Generates forecasts given added system and planets",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/views.BaseResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/views.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/views.BaseResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "views.AddPlanetRequest": {
+            "type": "object",
+            "properties": {
+                "clockwise": {
+                    "type": "boolean"
+                },
+                "initial_degrees": {
+                    "type": "number"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "radio": {
+                    "type": "number"
+                },
+                "solar_system_id": {
+                    "type": "integer"
+                },
+                "speed_by_day": {
+                    "type": "number"
+                }
+            }
+        },
+        "views.AddSolarSystemRequest": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "views.BaseResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object"
+                },
+                "status_code": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}

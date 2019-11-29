@@ -14,6 +14,13 @@ type ForecastController struct {
 	ServiceFactory func() services.PlanetService
 }
 
+// AddSolarSystem
+// @Description Adds a solar system into the database
+// @Param message body views.AddSolarSystemRequest false "Add Solar System Request"
+// @Success 201 {object} views.BaseResponse
+// @Failure 400 {object} views.BaseResponse
+// @Failure 500 {object} views.BaseResponse
+// @Router /solar_systems [post]
 func (f *ForecastController) AddSolarSystem(ctx *gin.Context) {
 	rawRequest, err := ioutil.ReadAll(ctx.Request.Body)
 	if err != nil {
@@ -36,6 +43,11 @@ func (f *ForecastController) AddSolarSystem(ctx *gin.Context) {
 	utils.StatusCreatedResponse(ctx, result)
 }
 
+// GetSolarSystems
+// @Description Gets all added solar systems
+// @Success 201 {object} views.BaseResponse
+// @Failure 500 {object} views.BaseResponse
+// @Router /solar_systems [get]
 func (f *ForecastController) GetSolarSystems(ctx *gin.Context) {
 	result, err := f.ServiceFactory().GetSolarSystems()
 	if err != nil {
@@ -46,6 +58,13 @@ func (f *ForecastController) GetSolarSystems(ctx *gin.Context) {
 	utils.StatusOkResponse(ctx, result)
 }
 
+// AddPlanet
+// @Description Adds a planet into the database
+// @Param message body views.AddPlanetRequest false "Add Planet Request"
+// @Success 201 {object} views.BaseResponse
+// @Failure 400 {object} views.BaseResponse
+// @Failure 500 {object} views.BaseResponse
+// @Router /planets [post]
 func (f *ForecastController) AddPlanet(ctx *gin.Context) {
 	rawRequest, err := ioutil.ReadAll(ctx.Request.Body)
 	if err != nil {
@@ -68,6 +87,11 @@ func (f *ForecastController) AddPlanet(ctx *gin.Context) {
 	utils.StatusCreatedResponse(ctx, result)
 }
 
+// GetPlanets
+// @Description Gets all added planets
+// @Success 201 {object} views.BaseResponse
+// @Failure 500 {object} views.BaseResponse
+// @Router /planets [get]
 func (f *ForecastController) GetPlanets(ctx *gin.Context) {
 	result, err := f.ServiceFactory().GetPlanets()
 	if err != nil {
@@ -78,6 +102,12 @@ func (f *ForecastController) GetPlanets(ctx *gin.Context) {
 	utils.StatusOkResponse(ctx, result)
 }
 
+// GenerateForecasts
+// @Description Generates forecasts given added system and planets
+// @Success 201 {object} views.BaseResponse
+// @Failure 400 {object} views.BaseResponse
+// @Failure 500 {object} views.BaseResponse
+// @Router /solar_systems/:id/generate_forecasts [post]
 func (f *ForecastController) GenerateForecasts(ctx *gin.Context) {
 	solarSystemId, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
@@ -96,6 +126,12 @@ func (f *ForecastController) GenerateForecasts(ctx *gin.Context) {
 	utils.StatusOkResponse(ctx, result)
 }
 
+// ObtainForecast
+// @Description Obtains a previously generated forecast
+// @Success 201 {object} views.BaseResponse
+// @Failure 400 {object} views.BaseResponse
+// @Failure 500 {object} views.BaseResponse
+// @Router /planets/forecast [get]
 func (f *ForecastController) ObtainForecast(ctx *gin.Context) {
 	day, err := strconv.Atoi(ctx.Query("day"))
 	if err != nil {
