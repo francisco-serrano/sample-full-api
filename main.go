@@ -6,6 +6,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/sample-full-api/models"
 	"github.com/sample-full-api/routers"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"time"
 )
@@ -20,10 +21,10 @@ func checkEnvironmentVariables() {
 	}
 }
 
-func obtainDbConnection() *gorm.DB {
+func obtainDbConnection() (*gorm.DB, error) {
 	db, err := gorm.Open("mysql", "root:root@/solar_system_db?parseTime=true")
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	db.AutoMigrate(&models.SolarSystem{}, &models.Planet{}, &models.DayForecast{})
@@ -34,15 +35,22 @@ func obtainDbConnection() *gorm.DB {
 	db.DB().SetMaxOpenConns(100)
 	db.DB().SetConnMaxLifetime(time.Hour)
 
-	return db
+	return db, nil
 }
 
 func main() {
 	checkEnvironmentVariables()
 
-	db := obtainDbConnection()
+	db, err := obtainDbConnection()
+	if err != nil {
+		panic(err)
+	}
 
-	router := routers.ObtainRoutes(db)
+	logger := log.New()
+	logger.SetOutput(os.Stdout)
+	logger.SetLevel(log.InfoLevel)
+
+	router := routers.ObtainRoutes(db, logger)
 
 	if err := router.Run(); err != nil {
 		panic(err)

@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
-	"github.com/sample-full-api/exercises"
 	"github.com/sample-full-api/models"
+	"github.com/sample-full-api/utils"
 	"github.com/sample-full-api/views"
+	log "github.com/sirupsen/logrus"
 	gormbulk "github.com/t-tiger/gorm-bulk-insert"
 	"math"
+	"strings"
 )
 
 type PlanetService interface {
@@ -22,11 +24,15 @@ type PlanetService interface {
 }
 
 type planetService struct {
-	db *gorm.DB
+	db     *gorm.DB
+	logger *log.Logger
 }
 
-func NewPlanetService(db *gorm.DB) *planetService {
-	return &planetService{db: db}
+func NewPlanetService(db *gorm.DB, logger *log.Logger) *planetService {
+	return &planetService{
+		db:     db,
+		logger: logger,
+	}
 }
 
 func (p *planetService) AddPlanet(request *views.AddPlanetRequest) *models.Planet {
@@ -122,7 +128,7 @@ func (p *planetService) buildPlanet(req *views.AddPlanetRequest) (*models.Planet
 
 // goroutine
 func (p *planetService) generateForecast(solarSystemId, daysAmount int) {
-	fmt.Printf("generating forecast for system %d for %d days\n", solarSystemId, daysAmount)
+	p.logger.Infof("generating forecast for system %d for %d days\n", solarSystemId, daysAmount)
 
 	p.cleanUpExistingForecasts(solarSystemId)
 
@@ -146,9 +152,9 @@ func (p *planetService) generateForecast(solarSystemId, daysAmount int) {
 	planetsCopy := make([]models.Planet, len(planets))
 	copy(planetsCopy, planets)
 
-	forecasts, result := exercises.AnalyzeDays(daysAmount, false, solarSystemId, planetsCopy...)
+	forecasts, result := p.analyzeDays(daysAmount, solarSystemId, planetsCopy...)
 
-	fmt.Printf("result %+v\n", result)
+	p.logger.Infof("result %+v\n", result)
 
 	if err := gormbulk.BulkInsert(tx, forecasts, 2000); err != nil {
 		tx.Rollback()
@@ -169,4 +175,99 @@ func (p *planetService) cleanUpExistingForecasts(solarSystemId int) {
 	if err := p.db.Delete(&existingForecasts).Error; err != nil {
 		panic(err)
 	}
+}
+
+type AnalysisResult struct {
+	Droughts          int64
+	RainyPeriods      int64
+	MaxPeak           int64
+	OptimalConditions int64
+}
+
+func (p *planetService) analyzeDays(days int, solarSystemID int, srcPlanets ...models.Planet) ([]interface{}, AnalysisResult) {
+	var forecasts []interface{}
+
+	planets := make([]models.Planet, len(srcPlanets))
+	copy(planets, srcPlanets)
+
+	sun := models.Planet{
+		Name:      "sun",
+		R:         0,
+		Degrees:   0,
+		Speed:     0,
+		Clockwise: false,
+		Radians:   0,
+		X:         0,
+		Y:         0,
+	}
+
+	amountAlignments := 0
+	amountRains, maxPerimeter, maxPerimeterDay := 0, 0.0, 0
+	amount := 0
+	for day := 0; day < days; day++ {
+		var forecast models.DayForecast
+		forecast.Day = day
+		forecast.SolarSystemID = uint(solarSystemID)
+
+		// exercise 1
+		if utils.AlignedWithSun(planets...) {
+			var positions []string
+			for _, planet := range planets {
+				positions = append(positions, fmt.Sprintf("%v", planet.Degrees))
+			}
+
+			p.logger.Infof("drought detected at day %v\t\tpositions %s\n", day, strings.Join(positions, ";"))
+
+			amountAlignments += 1
+			forecast.Drought = true
+		}
+
+		// exercise 2
+		if utils.WithinPolygon(sun, planets...) {
+			var positions []string
+			for _, planet := range planets {
+				positions = append(positions, fmt.Sprintf("r=%v, %v°", planet.R, planet.Degrees))
+			}
+
+			perimeter := utils.Perimeter(planets...)
+
+			if perimeter > maxPerimeter {
+				maxPerimeter = perimeter
+				maxPerimeterDay = day
+			}
+
+			p.logger.Infof("rainy period at day %v\t\t%s\n", day, strings.Join(positions, "\t"))
+
+			amountRains += 1
+			forecast.RainIntensity = perimeter
+		}
+
+		// exercise 3
+		if utils.AlignedWithoutSun(planets...) && !utils.AlignedWithSun(planets...) {
+			var positions []string
+			for _, planet := range planets {
+				positions = append(positions, fmt.Sprintf("r=%v, %v°", planet.R, planet.Degrees))
+			}
+
+			p.logger.Infof("optimal condition detected at day %d with positions %s\n", day, strings.Join(positions, "\t"))
+
+			amount += 1
+			forecast.OptimalTempPressure = true
+		}
+
+		forecasts = append(forecasts, forecast)
+
+		for i := 0; i < len(planets); i++ {
+			planets[i].AdvanceDay()
+		}
+	}
+
+	result := AnalysisResult{
+		Droughts:          int64(amountAlignments),
+		RainyPeriods:      int64(amountRains),
+		MaxPeak:           int64(maxPerimeterDay),
+		OptimalConditions: int64(amount),
+	}
+
+	return forecasts, result
 }

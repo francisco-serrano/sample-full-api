@@ -5,14 +5,15 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/sample-full-api/controllers"
 	"github.com/sample-full-api/services"
+	log "github.com/sirupsen/logrus"
 )
 
-func ObtainRoutes(db *gorm.DB) *gin.Engine {
+func ObtainRoutes(db *gorm.DB, logger *log.Logger) *gin.Engine {
 	router := gin.Default()
 
 	planetController := controllers.ForecastController{
 		ServiceFactory: func() services.PlanetService {
-			return services.NewPlanetService(db)
+			return services.NewPlanetService(db, logger)
 		},
 	}
 
