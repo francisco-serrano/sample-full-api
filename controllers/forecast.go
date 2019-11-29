@@ -32,6 +32,14 @@ func (f *ForecastController) AddSolarSystem(ctx *gin.Context) {
 	})
 }
 
+func (f *ForecastController) GetSolarSystems(ctx *gin.Context) {
+	result := f.ServiceFactory().GetSolarSystems()
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"result": result,
+	})
+}
+
 func (f *ForecastController) AddPlanet(ctx *gin.Context) {
 	rawRequest, err := ioutil.ReadAll(ctx.Request.Body)
 	if err != nil {
@@ -44,6 +52,14 @@ func (f *ForecastController) AddPlanet(ctx *gin.Context) {
 	}
 
 	result := f.ServiceFactory().AddPlanet(&request)
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"result": result,
+	})
+}
+
+func (f *ForecastController) GetPlanets(ctx *gin.Context) {
+	result := f.ServiceFactory().GetPlanets()
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"result": result,

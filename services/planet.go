@@ -14,7 +14,9 @@ import (
 
 type PlanetService interface {
 	AddPlanet(request *views.AddPlanetRequest) *models.Planet
+	GetPlanets() []models.Planet
 	AddSolarSystem(request *views.AddSolarSystemRequest) *models.SolarSystem
+	GetSolarSystems() []models.SolarSystem
 	GenerateForecasts(solarSystemId, daysAmount int) string
 	ObtainForecast(day int) gin.H
 }
@@ -40,6 +42,15 @@ func (p *planetService) AddPlanet(request *views.AddPlanetRequest) *models.Plane
 	return planet
 }
 
+func (p *planetService) GetPlanets() []models.Planet {
+	var planets []models.Planet
+	if err := p.db.Find(&planets).Error; err != nil {
+		panic(err)
+	}
+
+	return planets
+}
+
 func (p *planetService) AddSolarSystem(request *views.AddSolarSystemRequest) *models.SolarSystem {
 	solarSystem, err := p.buildSolarSystem(request)
 	if err != nil {
@@ -51,6 +62,15 @@ func (p *planetService) AddSolarSystem(request *views.AddSolarSystemRequest) *mo
 	}
 
 	return solarSystem
+}
+
+func (p *planetService) GetSolarSystems() []models.SolarSystem {
+	var systems []models.SolarSystem
+	if err := p.db.Find(&systems).Error; err != nil {
+		panic(err)
+	}
+
+	return systems
 }
 
 func (p *planetService) GenerateForecasts(solarSystemId, daysAmount int) string {
