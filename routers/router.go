@@ -2,18 +2,17 @@ package routers
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	"github.com/sample-full-api/controllers"
 	"github.com/sample-full-api/services"
-	log "github.com/sirupsen/logrus"
+	"github.com/sample-full-api/utils"
 )
 
-func ObtainRoutes(db *gorm.DB, logger *log.Logger) *gin.Engine {
+func ObtainRoutes(deps utils.Dependencies) *gin.Engine {
 	router := gin.Default()
 
 	planetController := controllers.ForecastController{
 		ServiceFactory: func() services.PlanetService {
-			return services.NewPlanetService(db, logger)
+			return services.NewPlanetService(deps.Db, deps.Logger)
 		},
 	}
 

@@ -216,7 +216,7 @@ func (p *planetService) analyzeDays(days int, solarSystemID int, srcPlanets ...m
 				positions = append(positions, fmt.Sprintf("%v", planet.Degrees))
 			}
 
-			p.logger.Infof("drought detected at day %v\t\tpositions %s\n", day, strings.Join(positions, ";"))
+			p.logger.Debugf("drought detected at day %v\t\tpositions %s\n", day, strings.Join(positions, ";"))
 
 			amountAlignments += 1
 			forecast.Drought = true
@@ -236,7 +236,7 @@ func (p *planetService) analyzeDays(days int, solarSystemID int, srcPlanets ...m
 				maxPerimeterDay = day
 			}
 
-			p.logger.Infof("rainy period at day %v\t\t%s\n", day, strings.Join(positions, "\t"))
+			p.logger.Debugf("rainy period at day %v\t\t%s\n", day, strings.Join(positions, "\t"))
 
 			amountRains += 1
 			forecast.RainIntensity = perimeter
@@ -249,7 +249,7 @@ func (p *planetService) analyzeDays(days int, solarSystemID int, srcPlanets ...m
 				positions = append(positions, fmt.Sprintf("r=%v, %v°", planet.R, planet.Degrees))
 			}
 
-			p.logger.Infof("optimal condition detected at day %d with positions %s\n", day, strings.Join(positions, "\t"))
+			p.logger.Debugf("optimal condition detected at day %d with positions %s\n", day, strings.Join(positions, "\t"))
 
 			amount += 1
 			forecast.OptimalTempPressure = true

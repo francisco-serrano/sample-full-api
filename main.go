@@ -1,28 +1,41 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 	"github.com/sample-full-api/models"
 	"github.com/sample-full-api/routers"
+	"github.com/sample-full-api/utils"
 	log "github.com/sirupsen/logrus"
 	"os"
 	"time"
 )
 
-func checkEnvironmentVariables() {
-	envVars := []string{"PORT"}
+func checkEnvironmentVariables() error {
+	envVars := []string{"PORT", "LOG_LEVEL", "DB_USER", "DB_PASS"}
 
 	for _, v := range envVars {
 		if myVar := os.Getenv(v); myVar == "" {
-			panic(fmt.Sprintf("%s not provided", v))
+			return errors.New(fmt.Sprintf("%s not provided", v))
 		}
 	}
+
+	return nil
 }
 
 func obtainDbConnection() (*gorm.DB, error) {
-	db, err := gorm.Open("mysql", "root:root@/solar_system_db?parseTime=true")
+	user := os.Getenv("DB_USER")
+	pass := os.Getenv("DB_PASS")
+
+	if user == "" || pass == "" {
+		return nil, errors.New("invalid user/pass")
+	}
+
+	connectionUrl := fmt.Sprintf("%s:%s@/solar_system_db?parseTime=true", user, pass)
+
+	db, err := gorm.Open("mysql", connectionUrl)
 	if err != nil {
 		return nil, err
 	}
@@ -38,19 +51,43 @@ func obtainDbConnection() (*gorm.DB, error) {
 	return db, nil
 }
 
+func obtainLogger() (*log.Logger, error) {
+	logger := log.New()
+	logger.SetOutput(os.Stdout)
+
+	switch os.Getenv("LOG_LEVEL") {
+	case "INFO":
+		logger.SetLevel(log.InfoLevel)
+	case "DEBUG":
+		logger.SetLevel(log.DebugLevel)
+	default:
+		return nil, errors.New("invalid log level value")
+	}
+
+	return logger, nil
+}
+
 func main() {
-	checkEnvironmentVariables()
+	if err := checkEnvironmentVariables(); err != nil {
+		panic(err)
+	}
 
 	db, err := obtainDbConnection()
 	if err != nil {
 		panic(err)
 	}
 
-	logger := log.New()
-	logger.SetOutput(os.Stdout)
-	logger.SetLevel(log.InfoLevel)
+	logger, err := obtainLogger()
+	if err != nil {
+		panic(err)
+	}
 
-	router := routers.ObtainRoutes(db, logger)
+	deps := utils.Dependencies{
+		Db:     db,
+		Logger: logger,
+	}
+
+	router := routers.ObtainRoutes(deps)
 
 	if err := router.Run(); err != nil {
 		panic(err)
