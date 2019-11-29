@@ -4,13 +4,14 @@ import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/sample-full-api/services"
+	"github.com/sample-full-api/views"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 )
 
 type ForecastController struct {
-	ServiceFactory func() *services.PlanetService
+	ServiceFactory func() services.PlanetService
 }
 
 func (f *ForecastController) AddSolarSystem(ctx *gin.Context) {
@@ -19,7 +20,7 @@ func (f *ForecastController) AddSolarSystem(ctx *gin.Context) {
 		panic(err)
 	}
 
-	var request services.AddSolarSystemRequest
+	var request views.AddSolarSystemRequest
 	if err = json.Unmarshal(rawRequest, &request); err != nil {
 		panic(err)
 	}
@@ -37,7 +38,7 @@ func (f *ForecastController) AddPlanet(ctx *gin.Context) {
 		panic(err)
 	}
 
-	var request services.AddPlanetRequest
+	var request views.AddPlanetRequest
 	if err = json.Unmarshal(rawRequest, &request); err != nil {
 		panic(err)
 	}

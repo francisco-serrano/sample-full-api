@@ -1,13 +1,10 @@
 package main
 
 import (
-	"errors"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 	"github.com/sample-full-api/models"
 	"github.com/sample-full-api/routers"
-	"github.com/sample-full-api/services"
-	"math"
 	"time"
 )
 
@@ -84,22 +81,22 @@ func main() {
 	}
 }
 
-func BuildPlanet(req *services.AddPlanetRequest) (*models.Planet, error) {
-	if req.Radio < 0.0 || req.InitialDegrees < 0.0 || req.InitialDegrees >= 360.0 {
-		return nil, errors.New("invalid input data")
-	}
-
-	radians := req.InitialDegrees * (math.Pi / 180.0)
-
-	return &models.Planet{
-		Name:          req.Name,
-		R:             req.Radio,
-		Degrees:       req.InitialDegrees,
-		Speed:         req.SpeedByDay,
-		Clockwise:     req.Clockwise,
-		Radians:       radians,
-		X:             math.Round(req.Radio*math.Cos(radians)*100) / 100,
-		Y:             math.Round(req.Radio*math.Sin(radians)*100) / 100,
-		SolarSystemID: req.SolarSystemId,
-	}, nil
-}
+//func BuildPlanet(req *views.AddPlanetRequest) (*models.Planet, error) {
+//	if req.Radio < 0.0 || req.InitialDegrees < 0.0 || req.InitialDegrees >= 360.0 {
+//		return nil, errors.New("invalid input data")
+//	}
+//
+//	radians := req.InitialDegrees * (math.Pi / 180.0)
+//
+//	return &models.Planet{
+//		Name:          req.Name,
+//		R:             req.Radio,
+//		Degrees:       req.InitialDegrees,
+//		Speed:         req.SpeedByDay,
+//		Clockwise:     req.Clockwise,
+//		Radians:       radians,
+//		X:             math.Round(req.Radio*math.Cos(radians)*100) / 100,
+//		Y:             math.Round(req.Radio*math.Sin(radians)*100) / 100,
+//		SolarSystemID: req.SolarSystemId,
+//	}, nil
+//}
