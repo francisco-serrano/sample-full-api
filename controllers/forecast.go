@@ -1,12 +1,10 @@
 package controllers
 
 import (
-	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/sample-full-api/services"
 	"github.com/sample-full-api/utils"
 	"github.com/sample-full-api/views"
-	"io/ioutil"
 	"strconv"
 )
 
@@ -22,14 +20,8 @@ type ForecastController struct {
 // @Failure 500 {object} views.BaseResponse
 // @Router /solar_systems [post]
 func (f *ForecastController) AddSolarSystem(ctx *gin.Context) {
-	rawRequest, err := ioutil.ReadAll(ctx.Request.Body)
-	if err != nil {
-		utils.StatusBadRequestResponse(ctx, err)
-		return
-	}
-
 	var request views.AddSolarSystemRequest
-	if err = json.Unmarshal(rawRequest, &request); err != nil {
+	if err := ctx.ShouldBindJSON(&request); err != nil {
 		utils.StatusBadRequestResponse(ctx, err)
 		return
 	}
@@ -66,14 +58,8 @@ func (f *ForecastController) GetSolarSystems(ctx *gin.Context) {
 // @Failure 500 {object} views.BaseResponse
 // @Router /planets [post]
 func (f *ForecastController) AddPlanet(ctx *gin.Context) {
-	rawRequest, err := ioutil.ReadAll(ctx.Request.Body)
-	if err != nil {
-		utils.StatusBadRequestResponse(ctx, err)
-		return
-	}
-
 	var request views.AddPlanetRequest
-	if err = json.Unmarshal(rawRequest, &request); err != nil {
+	if err := ctx.ShouldBindJSON(&request); err != nil {
 		utils.StatusBadRequestResponse(ctx, err)
 		return
 	}

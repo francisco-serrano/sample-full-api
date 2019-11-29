@@ -88,8 +88,7 @@ func main() {
 		Logger: logger,
 	}
 
-	engine := gin.New()
-	engine.Use(gin.Recovery())
+	engine := gin.Default()
 
 	routers.InitializeRoutes(engine, deps)
 
