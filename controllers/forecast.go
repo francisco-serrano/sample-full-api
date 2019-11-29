@@ -27,13 +27,21 @@ func (f *ForecastController) AddSolarSystem(ctx *gin.Context) {
 		return
 	}
 
-	result := f.ServiceFactory().AddSolarSystem(&request)
+	result, err := f.ServiceFactory().AddSolarSystem(&request)
+	if err != nil {
+		utils.StatusInternalErrorResponse(ctx, err)
+		return
+	}
 
 	utils.StatusCreatedResponse(ctx, result)
 }
 
 func (f *ForecastController) GetSolarSystems(ctx *gin.Context) {
-	result := f.ServiceFactory().GetSolarSystems()
+	result, err := f.ServiceFactory().GetSolarSystems()
+	if err != nil {
+		utils.StatusInternalErrorResponse(ctx, err)
+		return
+	}
 
 	utils.StatusOkResponse(ctx, result)
 }
@@ -51,13 +59,21 @@ func (f *ForecastController) AddPlanet(ctx *gin.Context) {
 		return
 	}
 
-	result := f.ServiceFactory().AddPlanet(&request)
+	result, err := f.ServiceFactory().AddPlanet(&request)
+	if err != nil {
+		utils.StatusInternalErrorResponse(ctx, err)
+		return
+	}
 
 	utils.StatusCreatedResponse(ctx, result)
 }
 
 func (f *ForecastController) GetPlanets(ctx *gin.Context) {
-	result := f.ServiceFactory().GetPlanets()
+	result, err := f.ServiceFactory().GetPlanets()
+	if err != nil {
+		utils.StatusInternalErrorResponse(ctx, err)
+		return
+	}
 
 	utils.StatusOkResponse(ctx, result)
 }
@@ -87,7 +103,11 @@ func (f *ForecastController) ObtainForecast(ctx *gin.Context) {
 		return
 	}
 
-	result := f.ServiceFactory().ObtainForecast(day)
+	result, err := f.ServiceFactory().ObtainForecast(day)
+	if err != nil {
+		utils.StatusInternalErrorResponse(ctx, err)
+		return
+	}
 
 	utils.StatusOkResponse(ctx, result)
 }

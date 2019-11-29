@@ -3,7 +3,6 @@ package services
 import (
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/sample-full-api/models"
 	"github.com/sample-full-api/utils"
@@ -15,12 +14,12 @@ import (
 )
 
 type PlanetService interface {
-	AddPlanet(request *views.AddPlanetRequest) *models.Planet
-	GetPlanets() []models.Planet
-	AddSolarSystem(request *views.AddSolarSystemRequest) *models.SolarSystem
-	GetSolarSystems() []models.SolarSystem
+	AddPlanet(request *views.AddPlanetRequest) (*models.Planet, error)
+	GetPlanets() (*[]models.Planet, error)
+	AddSolarSystem(request *views.AddSolarSystemRequest) (*models.SolarSystem, error)
+	GetSolarSystems() (*[]models.SolarSystem, error)
 	GenerateForecasts(solarSystemId, daysAmount int) string
-	ObtainForecast(day int) gin.H
+	ObtainForecast(day int) (*views.GetForecastResponse, error)
 }
 
 type planetService struct {

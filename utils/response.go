@@ -26,3 +26,10 @@ func StatusBadRequestResponse(ctx *gin.Context, err error) {
 		Data:       err,
 	})
 }
+
+func StatusInternalErrorResponse(ctx *gin.Context, err error) {
+	ctx.JSON(http.StatusInternalServerError, views.BaseResponse{
+		StatusCode: http.StatusInternalServerError,
+		Data:       err,
+	})
+}
