@@ -35,48 +35,48 @@ func NewPlanetService(db *gorm.DB, logger *log.Logger) *planetService {
 	}
 }
 
-func (p *planetService) AddPlanet(request *views.AddPlanetRequest) *models.Planet {
+func (p *planetService) AddPlanet(request *views.AddPlanetRequest) (*models.Planet, error) {
 	planet, err := p.buildPlanet(request)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	if err = p.db.Create(planet).Error; err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return planet
+	return planet, nil
 }
 
-func (p *planetService) GetPlanets() []models.Planet {
+func (p *planetService) GetPlanets() (*[]models.Planet, error) {
 	var planets []models.Planet
 	if err := p.db.Find(&planets).Error; err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return planets
+	return &planets, nil
 }
 
-func (p *planetService) AddSolarSystem(request *views.AddSolarSystemRequest) *models.SolarSystem {
+func (p *planetService) AddSolarSystem(request *views.AddSolarSystemRequest) (*models.SolarSystem, error) {
 	solarSystem, err := p.buildSolarSystem(request)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	if err = p.db.Create(solarSystem).Error; err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return solarSystem
+	return solarSystem, nil
 }
 
-func (p *planetService) GetSolarSystems() []models.SolarSystem {
+func (p *planetService) GetSolarSystems() (*[]models.SolarSystem, error) {
 	var systems []models.SolarSystem
 	if err := p.db.Find(&systems).Error; err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return systems
+	return &systems, nil
 }
 
 func (p *planetService) GenerateForecasts(solarSystemId, daysAmount int) string {
@@ -85,19 +85,19 @@ func (p *planetService) GenerateForecasts(solarSystemId, daysAmount int) string 
 	return fmt.Sprintf("job triggered for system %d", solarSystemId)
 }
 
-func (p *planetService) ObtainForecast(day int) gin.H {
+func (p *planetService) ObtainForecast(day int) (*views.GetForecastResponse, error) {
 	var forecast models.DayForecast
 	forecast.Day = day
 	forecast.DeletedAt = nil
 
 	if err := p.db.First(&forecast).Error; err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return gin.H{
-		"day":      day,
-		"forecast": forecast,
-	}
+	return &views.GetForecastResponse{
+		Day:      day,
+		Forecast: forecast,
+	}, nil
 }
 
 func (p *planetService) buildSolarSystem(req *views.AddSolarSystemRequest) (*models.SolarSystem, error) {
@@ -127,7 +127,7 @@ func (p *planetService) buildPlanet(req *views.AddPlanetRequest) (*models.Planet
 }
 
 // goroutine
-func (p *planetService) generateForecast(solarSystemId, daysAmount int) {
+func (p *planetService) generateForecast(solarSystemId, daysAmount int) error {
 	p.logger.Infof("generating forecast for system %d for %d days\n", solarSystemId, daysAmount)
 
 	p.cleanUpExistingForecasts(solarSystemId)
@@ -140,13 +140,12 @@ func (p *planetService) generateForecast(solarSystemId, daysAmount int) {
 	}()
 
 	if err := tx.Error; err != nil {
-		panic(err)
+		return err
 	}
 
 	var planets []models.Planet
 	if err := tx.Where(&models.Planet{SolarSystemID: uint(solarSystemId)}).Find(&planets).Error; err != nil {
 		tx.Rollback()
-		panic(err)
 	}
 
 	planetsCopy := make([]models.Planet, len(planets))
@@ -158,23 +157,26 @@ func (p *planetService) generateForecast(solarSystemId, daysAmount int) {
 
 	if err := gormbulk.BulkInsert(tx, forecasts, 2000); err != nil {
 		tx.Rollback()
-		panic(err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		panic(err)
+		return err
 	}
+
+	return nil
 }
 
-func (p *planetService) cleanUpExistingForecasts(solarSystemId int) {
+func (p *planetService) cleanUpExistingForecasts(solarSystemId int) error {
 	var existingForecasts []models.DayForecast
 	if err := p.db.Find(&existingForecasts, "solar_system_id = ?", solarSystemId).Error; err != nil {
-		panic(err)
+		return err
 	}
 
 	if err := p.db.Delete(&existingForecasts).Error; err != nil {
-		panic(err)
+		return err
 	}
+
+	return nil
 }
 
 type AnalysisResult struct {

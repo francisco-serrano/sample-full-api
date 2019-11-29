@@ -7,22 +7,18 @@ import (
 	"github.com/sample-full-api/utils"
 )
 
-func ObtainRoutes(deps utils.Dependencies) *gin.Engine {
-	router := gin.Default()
-
+func InitializeRoutes(engine *gin.Engine, deps utils.Dependencies) {
 	planetController := controllers.ForecastController{
 		ServiceFactory: func() services.PlanetService {
 			return services.NewPlanetService(deps.Db, deps.Logger)
 		},
 	}
 
-	router.POST("/planets", planetController.AddPlanet)
-	router.GET("/planets", planetController.GetPlanets)
-	router.GET("/planets/forecast", planetController.ObtainForecast)
+	engine.POST("/planets", planetController.AddPlanet)
+	engine.GET("/planets", planetController.GetPlanets)
+	engine.GET("/planets/forecast", planetController.ObtainForecast)
 
-	router.POST("/solar_systems", planetController.AddSolarSystem)
-	router.GET("/solar_systems", planetController.GetSolarSystems)
-	router.POST("/solar_systems/:id/generate_forecasts", planetController.GenerateForecasts)
-
-	return router
+	engine.POST("/solar_systems", planetController.AddSolarSystem)
+	engine.GET("/solar_systems", planetController.GetSolarSystems)
+	engine.POST("/solar_systems/:id/generate_forecasts", planetController.GenerateForecasts)
 }

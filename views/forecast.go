@@ -1,5 +1,7 @@
 package views
 
+import "github.com/sample-full-api/models"
+
 type AddPlanetRequest struct {
 	Name           string  `json:"name"`
 	Radio          float64 `json:"radio"`
@@ -11,4 +13,14 @@ type AddPlanetRequest struct {
 
 type AddSolarSystemRequest struct {
 	Name string `json:"name"`
+}
+
+type BaseResponse struct {
+	StatusCode int         `json:"status_code"`
+	Data       interface{} `json:"data"`
+}
+
+type GetForecastResponse struct {
+	Day      int                `json:"day"`
+	Forecast models.DayForecast `json:"forecast"`
 }

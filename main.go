@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 	"github.com/sample-full-api/models"
@@ -87,9 +88,12 @@ func main() {
 		Logger: logger,
 	}
 
-	router := routers.ObtainRoutes(deps)
+	engine := gin.New()
+	engine.Use(gin.Recovery())
 
-	if err := router.Run(); err != nil {
+	routers.InitializeRoutes(engine, deps)
+
+	if err := engine.Run(); err != nil {
 		panic(err)
 	}
 }
