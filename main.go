@@ -15,7 +15,7 @@ import (
 )
 
 func checkEnvironmentVariables() error {
-	envVars := []string{"PORT", "LOG_LEVEL", "DB_USER", "DB_PASS"}
+	envVars := []string{"PORT", "LOG_LEVEL", "DB_USER", "DB_PASS", "DB_HOST"}
 
 	for _, v := range envVars {
 		if myVar := os.Getenv(v); myVar == "" {
@@ -29,12 +29,13 @@ func checkEnvironmentVariables() error {
 func obtainDbConnection() (*gorm.DB, error) {
 	user := os.Getenv("DB_USER")
 	pass := os.Getenv("DB_PASS")
+	host := os.Getenv("DB_HOST")
 
-	if user == "" || pass == "" {
-		return nil, errors.New("invalid user/pass")
+	if user == "" || pass == "" || host == "" {
+		return nil, errors.New("invalid user/pass/host")
 	}
 
-	connectionUrl := fmt.Sprintf("%s:%s@/solar_system_db?parseTime=true", user, pass)
+	connectionUrl := fmt.Sprintf("%s:%s@(%s)/solar_system_db?parseTime=true", user, pass, host)
 
 	db, err := gorm.Open("mysql", connectionUrl)
 	if err != nil {

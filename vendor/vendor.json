@@ -21,6 +21,18 @@
 			"revisionTime": "2017-08-10T14:37:23Z"
 		},
 		{
+			"checksumSHA1": "GMZkEYluRh1pZxi3q6jMhRqWJTg=",
+			"path": "github.com/alecthomas/template",
+			"revision": "fb15b899a75114aa79cc930e33c46b577cc664b1",
+			"revisionTime": "2019-07-18T01:26:54Z"
+		},
+		{
+			"checksumSHA1": "j258GVxrs5Kv6o9lwUbK+KOgcNY=",
+			"path": "github.com/alecthomas/template/parse",
+			"revision": "fb15b899a75114aa79cc930e33c46b577cc664b1",
+			"revisionTime": "2019-07-18T01:26:54Z"
+		},
+		{
 			"checksumSHA1": "H0bPshte+4KAKnpIVtq1Q+GaurY=",
 			"path": "github.com/cpuguy83/go-md2man/md2man",
 			"revision": "eda4fa589184806b8720ea3b9146491209877a10",
@@ -249,10 +261,6 @@
 			"path": "github.com/urfave/cli",
 			"revision": "411b1b16687b61934df6eeb32e47761ffa4f2ec0",
 			"revisionTime": "2019-11-28T14:56:56Z"
-		},
-		{
-			"path": "github.com/urfave/cli/v2",
-			"revision": "411b1b16687b61934df6eeb32e47761ffa4f2ec0"
 		},
 		{
 			"checksumSHA1": "hcdWyC1u/0QHkpWYuhmJU4wpFCY=",
