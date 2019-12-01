@@ -13,7 +13,7 @@ import (
 
 func InitializeRoutes(engine *gin.Engine, deps utils.Dependencies) {
 	planetController := controllers.ForecastController{
-		ServiceFactory: func() services.PlanetService {
+		ServiceFactory: func() services.ForecastService {
 			return services.NewPlanetService(deps.Db, deps.Logger)
 		},
 	}
@@ -25,6 +25,9 @@ func InitializeRoutes(engine *gin.Engine, deps utils.Dependencies) {
 	engine.POST("/solar_systems", planetController.AddSolarSystem)
 	engine.GET("/solar_systems", planetController.GetSolarSystems)
 	engine.POST("/solar_systems/:id/generate_forecasts", planetController.GenerateForecasts)
+
+	engine.DELETE("/all/soft", planetController.SoftDelete)
+	engine.DELETE("/all/hard", planetController.HardDelete)
 
 	engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 }

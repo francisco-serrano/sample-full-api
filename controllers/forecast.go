@@ -9,7 +9,7 @@ import (
 )
 
 type ForecastController struct {
-	ServiceFactory func() services.PlanetService
+	ServiceFactory func() services.ForecastService
 }
 
 // AddSolarSystem
@@ -126,6 +126,34 @@ func (f *ForecastController) ObtainForecast(ctx *gin.Context) {
 	}
 
 	result, err := f.ServiceFactory().ObtainForecast(day)
+	if err != nil {
+		utils.StatusInternalErrorResponse(ctx, err)
+		return
+	}
+
+	utils.StatusOkResponse(ctx, result)
+}
+
+// SoftDelete
+// @Description Soft deletes existing systems, planets and forecasts
+// @Success 201 {object} views.BaseResponse
+// @Router /all/soft [delete]
+func (f *ForecastController) SoftDelete(ctx *gin.Context) {
+	result, err := f.ServiceFactory().CleanData(true)
+	if err != nil {
+		utils.StatusInternalErrorResponse(ctx, err)
+		return
+	}
+
+	utils.StatusOkResponse(ctx, result)
+}
+
+// SoftDelete
+// @Description Soft deletes existing systems, planets and forecasts
+// @Success 201 {object} views.BaseResponse
+// @Router /all/hard [delete]
+func (f *ForecastController) HardDelete(ctx *gin.Context) {
+	result, err := f.ServiceFactory().CleanData(false)
 	if err != nil {
 		utils.StatusInternalErrorResponse(ctx, err)
 		return

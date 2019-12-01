@@ -24,3 +24,7 @@ type GetForecastResponse struct {
 	Day      int                `json:"day"`
 	Forecast models.DayForecast `json:"forecast"`
 }
+
+type CleanDataResponse struct {
+	Message string `json:"message"`
+}

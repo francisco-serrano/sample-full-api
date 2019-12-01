@@ -5,6 +5,32 @@
         "license": {}
     },
     "paths": {
+        "/all/hard": {
+            "delete": {
+                "description": "Soft deletes existing systems, planets and forecasts",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/views.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/all/soft": {
+            "delete": {
+                "description": "Soft deletes existing systems, planets and forecasts",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/views.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/planets": {
             "get": {
                 "description": "Gets all added planets",
