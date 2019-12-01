@@ -7,7 +7,7 @@ import (
 
 type SolarSystem struct {
 	gorm.Model
-	Name string `gorm:"column:name;not null"`
+	Name string `gorm:"column:name;not null;unique_index:idx_name"`
 }
 
 type Planet struct {

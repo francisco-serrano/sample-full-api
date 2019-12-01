@@ -183,6 +183,12 @@ func (p *forecastService) buildSolarSystem(req *views.AddSolarSystemRequest) (*m
 }
 
 func (p *forecastService) buildPlanet(req *views.AddPlanetRequest) (*models.Planet, error) {
+	var solarSystem models.SolarSystem
+	solarSystem.Name = req.SolarSystemName
+	if err := p.db.Find(&solarSystem).Error; err != nil {
+		return nil, err
+	}
+
 	if req.Radio < 0.0 || req.InitialDegrees < 0.0 || req.InitialDegrees >= 360.0 {
 		return nil, errors.New("invalid input data")
 	}
@@ -198,7 +204,7 @@ func (p *forecastService) buildPlanet(req *views.AddPlanetRequest) (*models.Plan
 		Radians:       radians,
 		X:             math.Round(req.Radio*math.Cos(radians)*100) / 100,
 		Y:             math.Round(req.Radio*math.Sin(radians)*100) / 100,
-		SolarSystemID: req.SolarSystemId,
+		SolarSystemID: solarSystem.ID,
 	}, nil
 }
 
