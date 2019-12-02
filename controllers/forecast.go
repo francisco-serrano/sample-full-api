@@ -22,6 +22,7 @@ type ForecastController struct {
 func (f *ForecastController) AddSolarSystem(ctx *gin.Context) {
 	var request views.AddSolarSystemRequest
 	if err := ctx.ShouldBindJSON(&request); err != nil {
+
 		utils.StatusBadRequestResponse(ctx, err)
 		return
 	}

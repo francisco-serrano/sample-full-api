@@ -38,10 +38,12 @@ func NewPlanetService(deps utils.Dependencies) *forecastService {
 func (p *forecastService) AddPlanet(request *views.AddPlanetRequest) (*models.Planet, error) {
 	planet, err := p.buildPlanet(request)
 	if err != nil {
+		p.logger.WithError(err)
 		return nil, err
 	}
 
 	if err = p.db.Create(planet).Error; err != nil {
+		p.logger.WithError(err)
 		return nil, err
 	}
 
@@ -51,6 +53,7 @@ func (p *forecastService) AddPlanet(request *views.AddPlanetRequest) (*models.Pl
 func (p *forecastService) GetPlanets() (*[]models.Planet, error) {
 	var planets []models.Planet
 	if err := p.db.Find(&planets).Error; err != nil {
+		p.logger.WithError(err)
 		return nil, err
 	}
 
@@ -60,10 +63,12 @@ func (p *forecastService) GetPlanets() (*[]models.Planet, error) {
 func (p *forecastService) AddSolarSystem(request *views.AddSolarSystemRequest) (*models.SolarSystem, error) {
 	solarSystem, err := p.buildSolarSystem(request)
 	if err != nil {
+		p.logger.WithError(err)
 		return nil, err
 	}
 
 	if err = p.db.Create(solarSystem).Error; err != nil {
+		p.logger.WithError(err)
 		return nil, err
 	}
 
@@ -73,6 +78,7 @@ func (p *forecastService) AddSolarSystem(request *views.AddSolarSystemRequest) (
 func (p *forecastService) GetSolarSystems() (*[]models.SolarSystem, error) {
 	var systems []models.SolarSystem
 	if err := p.db.Find(&systems).Error; err != nil {
+		p.logger.WithError(err)
 		return nil, err
 	}
 
@@ -80,7 +86,11 @@ func (p *forecastService) GetSolarSystems() (*[]models.SolarSystem, error) {
 }
 
 func (p *forecastService) GenerateForecasts(solarSystemId, daysAmount int) string {
-	go p.generateForecast(solarSystemId, daysAmount)
+	go func() {
+		if err := p.generateForecast(solarSystemId, daysAmount); err != nil {
+			p.logger.WithError(err)
+		}
+	}()
 
 	return fmt.Sprintf("job triggered for system %d", solarSystemId)
 }
@@ -91,6 +101,7 @@ func (p *forecastService) ObtainForecast(day int) (*views.GetForecastResponse, e
 	forecast.DeletedAt = nil
 
 	if err := p.db.First(&forecast).Error; err != nil {
+		p.logger.WithError(err)
 		return nil, err
 	}
 
@@ -103,6 +114,7 @@ func (p *forecastService) ObtainForecast(day int) (*views.GetForecastResponse, e
 func (p *forecastService) CleanData(softDelete bool) (*views.CleanDataResponse, error) {
 	if softDelete {
 		if err := p.transactionalSoftDelete(); err != nil {
+			p.logger.WithError(err)
 			return nil, err
 		}
 
@@ -110,6 +122,7 @@ func (p *forecastService) CleanData(softDelete bool) (*views.CleanDataResponse, 
 	}
 
 	if err := p.transactionalHardDelete(); err != nil {
+		p.logger.WithError(err)
 		return nil, err
 	}
 
@@ -125,20 +138,24 @@ func (p *forecastService) transactionalSoftDelete() error {
 	}()
 
 	if err := tx.Error; err != nil {
+		p.logger.WithError(err)
 		return err
 	}
 
 	if err := p.db.Delete(&models.DayForecast{}).Error; err != nil {
+		p.logger.WithError(err)
 		tx.Rollback()
 		return err
 	}
 
 	if err := p.db.Delete(&models.Planet{}).Error; err != nil {
+		p.logger.WithError(err)
 		tx.Rollback()
 		return err
 	}
 
 	if err := p.db.Delete(&models.SolarSystem{}).Error; err != nil {
+		p.logger.WithError(err)
 		tx.Rollback()
 		return err
 	}
@@ -155,20 +172,24 @@ func (p *forecastService) transactionalHardDelete() error {
 	}()
 
 	if err := tx.Error; err != nil {
+		p.logger.WithError(err)
 		return err
 	}
 
 	if err := p.db.Unscoped().Delete(&models.DayForecast{}).Error; err != nil {
+		p.logger.WithError(err)
 		tx.Rollback()
 		return err
 	}
 
 	if err := p.db.Unscoped().Delete(&models.Planet{}).Error; err != nil {
+		p.logger.WithError(err)
 		tx.Rollback()
 		return err
 	}
 
 	if err := p.db.Unscoped().Delete(&models.SolarSystem{}).Error; err != nil {
+		p.logger.WithError(err)
 		tx.Rollback()
 		return err
 	}
@@ -186,11 +207,14 @@ func (p *forecastService) buildPlanet(req *views.AddPlanetRequest) (*models.Plan
 	var solarSystem models.SolarSystem
 	solarSystem.Name = req.SolarSystemName
 	if err := p.db.Find(&solarSystem).Error; err != nil {
+		p.logger.WithError(err)
 		return nil, err
 	}
 
 	if req.Radio < 0.0 || req.InitialDegrees < 0.0 || req.InitialDegrees >= 360.0 {
-		return nil, errors.New("invalid input data")
+		err := errors.New("invalid input data")
+		p.logger.WithError(err)
+		return nil, err
 	}
 
 	radians := req.InitialDegrees * (math.Pi / 180.0)
@@ -213,6 +237,7 @@ func (p *forecastService) generateForecast(solarSystemId, daysAmount int) error 
 	p.logger.Infof("generating forecast for system %d for %d days\n", solarSystemId, daysAmount)
 
 	if err := p.cleanUpExistingForecasts(solarSystemId); err != nil {
+		p.logger.WithError(err)
 		return err
 	}
 
@@ -224,11 +249,13 @@ func (p *forecastService) generateForecast(solarSystemId, daysAmount int) error 
 	}()
 
 	if err := tx.Error; err != nil {
+		p.logger.WithError(err)
 		return err
 	}
 
 	var planets []models.Planet
 	if err := tx.Where(&models.Planet{SolarSystemID: uint(solarSystemId)}).Find(&planets).Error; err != nil {
+		p.logger.WithError(err)
 		tx.Rollback()
 	}
 
@@ -240,10 +267,12 @@ func (p *forecastService) generateForecast(solarSystemId, daysAmount int) error 
 	p.logger.Infof("result %+v\n", result)
 
 	if err := gormbulk.BulkInsert(tx, forecasts, 2000); err != nil {
+		p.logger.WithError(err)
 		tx.Rollback()
 	}
 
 	if err := tx.Commit().Error; err != nil {
+		p.logger.WithError(err)
 		return err
 	}
 
@@ -253,10 +282,12 @@ func (p *forecastService) generateForecast(solarSystemId, daysAmount int) error 
 func (p *forecastService) cleanUpExistingForecasts(solarSystemId int) error {
 	var existingForecasts []models.DayForecast
 	if err := p.db.Find(&existingForecasts, "solar_system_id = ?", solarSystemId).Error; err != nil {
+		p.logger.WithError(err)
 		return err
 	}
 
 	if err := p.db.Delete(&existingForecasts).Error; err != nil {
+		p.logger.WithError(err)
 		return err
 	}
 
