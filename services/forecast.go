@@ -97,11 +97,10 @@ func (p *forecastService) GenerateForecasts(solarSystemId, daysAmount int) strin
 
 func (p *forecastService) ObtainForecast(solarSystemId, day int) (*views.GetForecastResponse, *utils.ForecastError) {
 	var forecast models.DayForecast
-	forecast.Day = day
-	forecast.DeletedAt = nil
-	forecast.SolarSystemID = uint(solarSystemId)
-
-	if err := p.db.First(&forecast).Error; err != nil {
+	if err := p.db.Where(&models.DayForecast{
+		Day:           day,
+		SolarSystemID: uint(solarSystemId),
+	}).First(&forecast).Error; err != nil {
 		p.logger.Error(err)
 		if err == gorm.ErrRecordNotFound {
 			return nil, utils.ErrorNotFound(err.Error())
@@ -220,8 +219,9 @@ func (p *forecastService) buildSolarSystem(req *views.AddSolarSystemRequest) (*m
 
 func (p *forecastService) buildPlanet(req *views.AddPlanetRequest) (*models.Planet, *utils.ForecastError) {
 	var solarSystem models.SolarSystem
-	solarSystem.Name = req.SolarSystemName
-	if err := p.db.Find(&solarSystem).Error; err != nil {
+	if err := p.db.Where(&models.SolarSystem{
+		Name: req.SolarSystemName,
+	}).Find(&solarSystem).Error; err != nil {
 		p.logger.Error(err)
 		return nil, utils.ErrorInternal(err.Error())
 	}
@@ -295,13 +295,9 @@ func (p *forecastService) generateForecast(solarSystemId, daysAmount int) *utils
 }
 
 func (p *forecastService) cleanUpExistingForecasts(solarSystemId int) *utils.ForecastError {
-	var existingForecasts []models.DayForecast
-	if err := p.db.Find(&existingForecasts, "solar_system_id = ?", solarSystemId).Error; err != nil {
-		p.logger.Error(err)
-		return utils.ErrorInternal(err.Error())
-	}
-
-	if err := p.db.Delete(&existingForecasts).Error; err != nil {
+	if err := p.db.Where(&models.DayForecast{
+		SolarSystemID: uint(solarSystemId),
+	}).Delete(&models.DayForecast{}).Error; err != nil {
 		p.logger.Error(err)
 		return utils.ErrorInternal(err.Error())
 	}
