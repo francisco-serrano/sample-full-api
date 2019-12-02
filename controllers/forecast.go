@@ -5,6 +5,7 @@ import (
 	"github.com/sample-full-api/services"
 	"github.com/sample-full-api/utils"
 	"github.com/sample-full-api/views"
+	"net/http"
 	"strconv"
 )
 
@@ -22,18 +23,17 @@ type ForecastController struct {
 func (f *ForecastController) AddSolarSystem(ctx *gin.Context) {
 	var request views.AddSolarSystemRequest
 	if err := ctx.ShouldBindJSON(&request); err != nil {
-
-		utils.StatusBadRequestResponse(ctx, err)
+		utils.SetResponse(ctx, http.StatusBadRequest, err)
 		return
 	}
 
 	result, err := f.ServiceFactory().AddSolarSystem(&request)
 	if err != nil {
-		utils.StatusInternalErrorResponse(ctx, err)
+		utils.SetResponse(ctx, utils.GetStatusErrorCode(err), err)
 		return
 	}
 
-	utils.StatusCreatedResponse(ctx, result)
+	utils.SetResponse(ctx, http.StatusCreated, result)
 }
 
 // GetSolarSystems
@@ -44,11 +44,11 @@ func (f *ForecastController) AddSolarSystem(ctx *gin.Context) {
 func (f *ForecastController) GetSolarSystems(ctx *gin.Context) {
 	result, err := f.ServiceFactory().GetSolarSystems()
 	if err != nil {
-		utils.StatusInternalErrorResponse(ctx, err)
+		utils.SetResponse(ctx, utils.GetStatusErrorCode(err), err)
 		return
 	}
 
-	utils.StatusOkResponse(ctx, result)
+	utils.SetResponse(ctx, http.StatusOK, result)
 }
 
 // AddPlanet
@@ -61,17 +61,17 @@ func (f *ForecastController) GetSolarSystems(ctx *gin.Context) {
 func (f *ForecastController) AddPlanet(ctx *gin.Context) {
 	var request views.AddPlanetRequest
 	if err := ctx.ShouldBindJSON(&request); err != nil {
-		utils.StatusBadRequestResponse(ctx, err)
+		utils.SetResponse(ctx, http.StatusBadRequest, err)
 		return
 	}
 
 	result, err := f.ServiceFactory().AddPlanet(&request)
 	if err != nil {
-		utils.StatusInternalErrorResponse(ctx, err)
+		utils.SetResponse(ctx, utils.GetStatusErrorCode(err), err)
 		return
 	}
 
-	utils.StatusCreatedResponse(ctx, result)
+	utils.SetResponse(ctx, http.StatusCreated, result)
 }
 
 // GetPlanets
@@ -82,11 +82,11 @@ func (f *ForecastController) AddPlanet(ctx *gin.Context) {
 func (f *ForecastController) GetPlanets(ctx *gin.Context) {
 	result, err := f.ServiceFactory().GetPlanets()
 	if err != nil {
-		utils.StatusInternalErrorResponse(ctx, err)
+		utils.SetResponse(ctx, utils.GetStatusErrorCode(err), err)
 		return
 	}
 
-	utils.StatusOkResponse(ctx, result)
+	utils.SetResponse(ctx, http.StatusOK, result)
 }
 
 // GenerateForecasts
@@ -98,19 +98,19 @@ func (f *ForecastController) GetPlanets(ctx *gin.Context) {
 func (f *ForecastController) GenerateForecasts(ctx *gin.Context) {
 	solarSystemId, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
-		utils.StatusBadRequestResponse(ctx, err)
+		utils.SetResponse(ctx, http.StatusBadRequest, err)
 		return
 	}
 
 	daysAmount, err := strconv.Atoi(ctx.Query("days"))
 	if err != nil {
-		utils.StatusBadRequestResponse(ctx, err)
+		utils.SetResponse(ctx, http.StatusBadRequest, err)
 		return
 	}
 
 	result := f.ServiceFactory().GenerateForecasts(solarSystemId, daysAmount)
 
-	utils.StatusOkResponse(ctx, result)
+	utils.SetResponse(ctx, http.StatusOK, result)
 }
 
 // ObtainForecast
@@ -122,17 +122,17 @@ func (f *ForecastController) GenerateForecasts(ctx *gin.Context) {
 func (f *ForecastController) ObtainForecast(ctx *gin.Context) {
 	day, err := strconv.Atoi(ctx.Query("day"))
 	if err != nil {
-		utils.StatusBadRequestResponse(ctx, err)
+		utils.SetResponse(ctx, http.StatusBadRequest, err)
 		return
 	}
 
 	result, err := f.ServiceFactory().ObtainForecast(day)
 	if err != nil {
-		utils.StatusInternalErrorResponse(ctx, err)
+		utils.SetResponse(ctx, utils.GetStatusErrorCode(err.(*utils.ForecastError)), err)
 		return
 	}
 
-	utils.StatusOkResponse(ctx, result)
+	utils.SetResponse(ctx, http.StatusOK, result)
 }
 
 // SoftDelete
@@ -143,11 +143,11 @@ func (f *ForecastController) ObtainForecast(ctx *gin.Context) {
 func (f *ForecastController) SoftDelete(ctx *gin.Context) {
 	result, err := f.ServiceFactory().CleanData(true)
 	if err != nil {
-		utils.StatusInternalErrorResponse(ctx, err)
+		utils.SetResponse(ctx, utils.GetStatusErrorCode(err), err)
 		return
 	}
 
-	utils.StatusOkResponse(ctx, result)
+	utils.SetResponse(ctx, http.StatusOK, result)
 }
 
 // SoftDelete
@@ -158,9 +158,9 @@ func (f *ForecastController) SoftDelete(ctx *gin.Context) {
 func (f *ForecastController) HardDelete(ctx *gin.Context) {
 	result, err := f.ServiceFactory().CleanData(false)
 	if err != nil {
-		utils.StatusInternalErrorResponse(ctx, err)
+		utils.SetResponse(ctx, utils.GetStatusErrorCode(err), err)
 		return
 	}
 
-	utils.StatusOkResponse(ctx, result)
+	utils.SetResponse(ctx, http.StatusOK, result)
 }

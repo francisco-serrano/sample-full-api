@@ -60,6 +60,8 @@ func obtainLogger() (*log.Logger, error) {
 	switch os.Getenv("LOG_LEVEL") {
 	case "INFO":
 		logger.SetLevel(log.InfoLevel)
+	case "ERROR":
+		logger.SetLevel(log.ErrorLevel)
 	case "DEBUG":
 		logger.SetLevel(log.DebugLevel)
 	default:
