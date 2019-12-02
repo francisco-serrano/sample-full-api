@@ -30,11 +30,12 @@ func InitializeRoutes(engine *gin.Engine, deps utils.Dependencies) {
 
 	group.POST("/planets", planetController.AddPlanet)
 	group.GET("/planets", planetController.GetPlanets)
-	group.GET("/planets/forecast", planetController.ObtainForecast)
 
 	group.POST("/solar_systems", planetController.AddSolarSystem)
 	group.GET("/solar_systems", planetController.GetSolarSystems)
+
 	group.POST("/solar_systems/:id/generate_forecasts", planetController.GenerateForecasts)
+	group.GET("/solar_systems/:id/obtain_forecasts", planetController.ObtainForecast)
 
 	group.DELETE("/all/soft", planetController.SoftDelete)
 	group.DELETE("/all/hard", planetController.HardDelete)

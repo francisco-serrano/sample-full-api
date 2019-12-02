@@ -12,7 +12,7 @@ type SolarSystem struct {
 
 type Planet struct {
 	gorm.Model
-	Name          string  `gorm:"column:name;not null"`
+	Name          string  `gorm:"column:name;not null;unique_index:idx_name"`
 	R             float64 `gorm:"column:r;not null"`
 	Degrees       float64 `gorm:"column:degrees;not null"`
 	Speed         float64 `gorm:"column:speed;not null"`

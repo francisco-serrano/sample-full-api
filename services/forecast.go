@@ -19,7 +19,7 @@ type ForecastService interface {
 	AddSolarSystem(request *views.AddSolarSystemRequest) (*models.SolarSystem, *utils.ForecastError)
 	GetSolarSystems() (*[]models.SolarSystem, *utils.ForecastError)
 	GenerateForecasts(solarSystemId, daysAmount int) string
-	ObtainForecast(day int) (*views.GetForecastResponse, *utils.ForecastError)
+	ObtainForecast(solarSystemId, day int) (*views.GetForecastResponse, *utils.ForecastError)
 	CleanData(softDelete bool) (*views.CleanDataResponse, *utils.ForecastError)
 }
 
@@ -95,10 +95,11 @@ func (p *forecastService) GenerateForecasts(solarSystemId, daysAmount int) strin
 	return fmt.Sprintf("job triggered for system %d", solarSystemId)
 }
 
-func (p *forecastService) ObtainForecast(day int) (*views.GetForecastResponse, *utils.ForecastError) {
+func (p *forecastService) ObtainForecast(solarSystemId, day int) (*views.GetForecastResponse, *utils.ForecastError) {
 	var forecast models.DayForecast
 	forecast.Day = day
 	forecast.DeletedAt = nil
+	forecast.SolarSystemID = uint(solarSystemId)
 
 	if err := p.db.First(&forecast).Error; err != nil {
 		p.logger.Error(err)

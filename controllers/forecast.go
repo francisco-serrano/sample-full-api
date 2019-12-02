@@ -118,17 +118,22 @@ func (f *ForecastController) GenerateForecasts(ctx *gin.Context) {
 // @Success 201 {object} views.BaseResponse
 // @Failure 400 {object} views.BaseResponse
 // @Failure 500 {object} views.BaseResponse
-// @Router /forecast/planets/forecast [get]
+// @Router solar_systems/:id/obtain_forecasts [get]
 func (f *ForecastController) ObtainForecast(ctx *gin.Context) {
-	day, err := strconv.Atoi(ctx.Query("day"))
+	solarSystemId, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
 		utils.SetResponse(ctx, http.StatusBadRequest, err)
 		return
 	}
 
-	result, err := f.ServiceFactory().ObtainForecast(day)
+	day, err := strconv.Atoi(ctx.Query("day"))
 	if err != nil {
-		utils.SetResponse(ctx, utils.GetStatusErrorCode(err.(*utils.ForecastError)), err)
+		utils.SetResponse(ctx, http.StatusBadRequest, err)
+		return
+	}
+	result, forecastErr := f.ServiceFactory().ObtainForecast(solarSystemId, day)
+	if forecastErr != nil {
+		utils.SetResponse(ctx, utils.GetStatusErrorCode(forecastErr), forecastErr)
 		return
 	}
 
