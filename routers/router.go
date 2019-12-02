@@ -12,22 +12,32 @@ import (
 )
 
 func InitializeRoutes(engine *gin.Engine, deps utils.Dependencies) {
-	planetController := controllers.ForecastController{
-		ServiceFactory: func() services.ForecastService {
-			return services.NewPlanetService(deps.Db, deps.Logger)
+	healthController := controllers.HealthController{
+		ServiceFactory: func() services.HealthService {
+			return services.NewHealthService(deps)
 		},
 	}
 
-	engine.POST("/planets", planetController.AddPlanet)
-	engine.GET("/planets", planetController.GetPlanets)
-	engine.GET("/planets/forecast", planetController.ObtainForecast)
+	planetController := controllers.ForecastController{
+		ServiceFactory: func() services.ForecastService {
+			return services.NewPlanetService(deps)
+		},
+	}
 
-	engine.POST("/solar_systems", planetController.AddSolarSystem)
-	engine.GET("/solar_systems", planetController.GetSolarSystems)
-	engine.POST("/solar_systems/:id/generate_forecasts", planetController.GenerateForecasts)
+	group := engine.Group("/forecast")
 
-	engine.DELETE("/all/soft", planetController.SoftDelete)
-	engine.DELETE("/all/hard", planetController.HardDelete)
+	group.GET("/health", healthController.HealthCheck)
 
-	engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	group.POST("/planets", planetController.AddPlanet)
+	group.GET("/planets", planetController.GetPlanets)
+	group.GET("/planets/forecast", planetController.ObtainForecast)
+
+	group.POST("/solar_systems", planetController.AddSolarSystem)
+	group.GET("/solar_systems", planetController.GetSolarSystems)
+	group.POST("/solar_systems/:id/generate_forecasts", planetController.GenerateForecasts)
+
+	group.DELETE("/all/soft", planetController.SoftDelete)
+	group.DELETE("/all/hard", planetController.HardDelete)
+
+	group.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 }

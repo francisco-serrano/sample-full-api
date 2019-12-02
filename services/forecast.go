@@ -28,10 +28,10 @@ type forecastService struct {
 	logger *log.Logger
 }
 
-func NewPlanetService(db *gorm.DB, logger *log.Logger) *forecastService {
+func NewPlanetService(deps utils.Dependencies) *forecastService {
 	return &forecastService{
-		db:     db,
-		logger: logger,
+		db:     deps.Db,
+		logger: deps.Logger,
 	}
 }
 

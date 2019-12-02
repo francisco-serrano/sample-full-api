@@ -6,30 +6,37 @@ import (
 	"net/http"
 )
 
-func StatusOkResponse(ctx *gin.Context, result interface{}) {
+func StatusOkResponse(ctx *gin.Context, data interface{}) {
 	ctx.JSON(http.StatusOK, views.BaseResponse{
 		StatusCode: http.StatusOK,
-		Data:       result,
+		Data:       data,
 	})
 }
 
-func StatusCreatedResponse(ctx *gin.Context, result interface{}) {
+func StatusCreatedResponse(ctx *gin.Context, data interface{}) {
 	ctx.JSON(http.StatusCreated, views.BaseResponse{
 		StatusCode: http.StatusCreated,
-		Data:       result,
+		Data:       data,
 	})
 }
 
-func StatusBadRequestResponse(ctx *gin.Context, err error) {
+func StatusBadRequestResponse(ctx *gin.Context, data interface{}) {
 	ctx.JSON(http.StatusBadRequest, views.BaseResponse{
 		StatusCode: http.StatusBadRequest,
-		Data:       err,
+		Data:       data,
 	})
 }
 
-func StatusInternalErrorResponse(ctx *gin.Context, err error) {
+func StatusInternalErrorResponse(ctx *gin.Context, data interface{}) {
 	ctx.JSON(http.StatusInternalServerError, views.BaseResponse{
 		StatusCode: http.StatusInternalServerError,
-		Data:       err,
+		Data:       data,
+	})
+}
+
+func StatusServiceUnavailable(ctx *gin.Context, data interface{}) {
+	ctx.JSON(http.StatusServiceUnavailable, views.BaseResponse{
+		StatusCode: http.StatusServiceUnavailable,
+		Data:       data,
 	})
 }

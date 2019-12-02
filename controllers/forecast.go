@@ -18,7 +18,7 @@ type ForecastController struct {
 // @Success 201 {object} views.BaseResponse
 // @Failure 400 {object} views.BaseResponse
 // @Failure 500 {object} views.BaseResponse
-// @Router /solar_systems [post]
+// @Router /forecast/solar_systems [post]
 func (f *ForecastController) AddSolarSystem(ctx *gin.Context) {
 	var request views.AddSolarSystemRequest
 	if err := ctx.ShouldBindJSON(&request); err != nil {
@@ -39,7 +39,7 @@ func (f *ForecastController) AddSolarSystem(ctx *gin.Context) {
 // @Description Gets all added solar systems
 // @Success 201 {object} views.BaseResponse
 // @Failure 500 {object} views.BaseResponse
-// @Router /solar_systems [get]
+// @Router /forecast/solar_systems [get]
 func (f *ForecastController) GetSolarSystems(ctx *gin.Context) {
 	result, err := f.ServiceFactory().GetSolarSystems()
 	if err != nil {
@@ -56,7 +56,7 @@ func (f *ForecastController) GetSolarSystems(ctx *gin.Context) {
 // @Success 201 {object} views.BaseResponse
 // @Failure 400 {object} views.BaseResponse
 // @Failure 500 {object} views.BaseResponse
-// @Router /planets [post]
+// @Router /forecast/planets [post]
 func (f *ForecastController) AddPlanet(ctx *gin.Context) {
 	var request views.AddPlanetRequest
 	if err := ctx.ShouldBindJSON(&request); err != nil {
@@ -77,7 +77,7 @@ func (f *ForecastController) AddPlanet(ctx *gin.Context) {
 // @Description Gets all added planets
 // @Success 201 {object} views.BaseResponse
 // @Failure 500 {object} views.BaseResponse
-// @Router /planets [get]
+// @Router /forecast/planets [get]
 func (f *ForecastController) GetPlanets(ctx *gin.Context) {
 	result, err := f.ServiceFactory().GetPlanets()
 	if err != nil {
@@ -93,7 +93,7 @@ func (f *ForecastController) GetPlanets(ctx *gin.Context) {
 // @Success 201 {object} views.BaseResponse
 // @Failure 400 {object} views.BaseResponse
 // @Failure 500 {object} views.BaseResponse
-// @Router /solar_systems/:id/generate_forecasts [post]
+// @Router /forecast/solar_systems/:id/generate_forecasts [post]
 func (f *ForecastController) GenerateForecasts(ctx *gin.Context) {
 	solarSystemId, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
@@ -117,7 +117,7 @@ func (f *ForecastController) GenerateForecasts(ctx *gin.Context) {
 // @Success 201 {object} views.BaseResponse
 // @Failure 400 {object} views.BaseResponse
 // @Failure 500 {object} views.BaseResponse
-// @Router /planets/forecast [get]
+// @Router /forecast/planets/forecast [get]
 func (f *ForecastController) ObtainForecast(ctx *gin.Context) {
 	day, err := strconv.Atoi(ctx.Query("day"))
 	if err != nil {
@@ -137,7 +137,8 @@ func (f *ForecastController) ObtainForecast(ctx *gin.Context) {
 // SoftDelete
 // @Description Soft deletes existing systems, planets and forecasts
 // @Success 201 {object} views.BaseResponse
-// @Router /all/soft [delete]
+// @Failure 500 {object} views.BaseResponse
+// @Router /forecast/all/soft [delete]
 func (f *ForecastController) SoftDelete(ctx *gin.Context) {
 	result, err := f.ServiceFactory().CleanData(true)
 	if err != nil {
@@ -151,7 +152,8 @@ func (f *ForecastController) SoftDelete(ctx *gin.Context) {
 // SoftDelete
 // @Description Soft deletes existing systems, planets and forecasts
 // @Success 201 {object} views.BaseResponse
-// @Router /all/hard [delete]
+// @Failure 500 {object} views.BaseResponse
+// @Router /forecast/all/hard [delete]
 func (f *ForecastController) HardDelete(ctx *gin.Context) {
 	result, err := f.ServiceFactory().CleanData(false)
 	if err != nil {
