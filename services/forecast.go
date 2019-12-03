@@ -14,10 +14,10 @@ import (
 )
 
 type ForecastService interface {
-	AddPlanet(request *views.AddPlanetRequest) (*models.Planet, *utils.ForecastError)
-	GetPlanets() (*[]models.Planet, *utils.ForecastError)
-	AddSolarSystem(request *views.AddSolarSystemRequest) (*models.SolarSystem, *utils.ForecastError)
-	GetSolarSystems() (*[]models.SolarSystem, *utils.ForecastError)
+	AddPlanet(request *views.AddPlanetRequest) (*views.AddPlanetResponse, *utils.ForecastError)
+	GetPlanets() (*views.GetPlanetsResponse, *utils.ForecastError)
+	AddSolarSystem(request *views.AddSolarSystemRequest) (*views.AddSolarSystemResponse, *utils.ForecastError)
+	GetSolarSystems() (*views.GetSolarSystemsResponse, *utils.ForecastError)
 	GenerateForecasts(solarSystemId, daysAmount int) string
 	ObtainForecast(solarSystemId, day int) (*views.GetForecastResponse, *utils.ForecastError)
 	CleanData(softDelete bool) (*views.CleanDataResponse, *utils.ForecastError)
@@ -35,7 +35,7 @@ func NewPlanetService(deps utils.Dependencies) *forecastService {
 	}
 }
 
-func (p *forecastService) AddPlanet(request *views.AddPlanetRequest) (*models.Planet, *utils.ForecastError) {
+func (p *forecastService) AddPlanet(request *views.AddPlanetRequest) (*views.AddPlanetResponse, *utils.ForecastError) {
 	planet, err := p.buildPlanet(request)
 	if err != nil {
 		p.logger.Error(err)
@@ -47,20 +47,44 @@ func (p *forecastService) AddPlanet(request *views.AddPlanetRequest) (*models.Pl
 		return nil, utils.ErrorInternal(err.Error())
 	}
 
-	return planet, nil
+	return &views.AddPlanetResponse{
+		Name:            planet.Name,
+		Radio:           planet.R,
+		InitialDegrees:  planet.Degrees,
+		SpeedByDay:      planet.Speed,
+		Clockwise:       planet.Clockwise,
+		SolarSystemName: request.SolarSystemName,
+		X:               planet.X,
+		Y:               planet.Y,
+	}, nil
 }
 
-func (p *forecastService) GetPlanets() (*[]models.Planet, *utils.ForecastError) {
+func (p *forecastService) GetPlanets() (*views.GetPlanetsResponse, *utils.ForecastError) {
 	var planets []models.Planet
 	if err := p.db.Find(&planets).Error; err != nil {
 		p.logger.Error(err)
 		return nil, utils.ErrorInternal(err.Error())
 	}
 
-	return &planets, nil
+	var planetsResponse []views.GetPlanetResponse
+	for _, planet := range planets {
+		planetResponse := views.GetPlanetResponse{
+			Name:           planet.Name,
+			Radio:          planet.R,
+			InitialDegrees: planet.Degrees,
+			SpeedByDay:     planet.Speed,
+			Clockwise:      planet.Clockwise,
+			X:              planet.X,
+			Y:              planet.Y,
+			SolarSystemID:  planet.SolarSystemID,
+		}
+		planetsResponse = append(planetsResponse, planetResponse)
+	}
+
+	return &views.GetPlanetsResponse{Planets: planetsResponse}, nil
 }
 
-func (p *forecastService) AddSolarSystem(request *views.AddSolarSystemRequest) (*models.SolarSystem, *utils.ForecastError) {
+func (p *forecastService) AddSolarSystem(request *views.AddSolarSystemRequest) (*views.AddSolarSystemResponse, *utils.ForecastError) {
 	solarSystem, err := p.buildSolarSystem(request)
 	if err != nil {
 		p.logger.Error(err)
@@ -72,17 +96,26 @@ func (p *forecastService) AddSolarSystem(request *views.AddSolarSystemRequest) (
 		return nil, utils.ErrorInternal("unable to add solar system")
 	}
 
-	return solarSystem, nil
+	return &views.AddSolarSystemResponse{Name: solarSystem.Name}, nil
 }
 
-func (p *forecastService) GetSolarSystems() (*[]models.SolarSystem, *utils.ForecastError) {
+func (p *forecastService) GetSolarSystems() (*views.GetSolarSystemsResponse, *utils.ForecastError) {
 	var systems []models.SolarSystem
 	if err := p.db.Find(&systems).Error; err != nil {
 		p.logger.Error(err)
 		return nil, utils.ErrorInternal(err.Error())
 	}
 
-	return &systems, nil
+	var systemsResponse []views.GetSolarSystemResponse
+	for _, system := range systems {
+		systemResponse := views.GetSolarSystemResponse{
+			Name: system.Name,
+			ID:   system.ID,
+		}
+		systemsResponse = append(systemsResponse, systemResponse)
+	}
+
+	return &views.GetSolarSystemsResponse{SolarSystems: systemsResponse}, nil
 }
 
 func (p *forecastService) GenerateForecasts(solarSystemId, daysAmount int) string {
