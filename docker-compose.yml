@@ -26,6 +26,7 @@ services:
       DB_USER: root
       DB_PASS: root
       DB_HOST: mysql:3306
+      JWT_EXP_TIME_MINUTES: 30
 
   prod:
     container_name: sample-api-prod

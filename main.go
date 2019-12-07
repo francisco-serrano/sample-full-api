@@ -15,7 +15,7 @@ import (
 )
 
 func checkEnvironmentVariables() error {
-	envVars := []string{"PORT", "LOG_LEVEL", "DB_USER", "DB_PASS", "DB_HOST"}
+	envVars := []string{"PORT", "LOG_LEVEL", "DB_USER", "DB_PASS", "DB_HOST", "JWT_EXP_TIME_MINUTES"}
 
 	for _, v := range envVars {
 		if myVar := os.Getenv(v); myVar == "" {
@@ -42,7 +42,7 @@ func obtainDbConnection() (*gorm.DB, error) {
 		return nil, err
 	}
 
-	db.AutoMigrate(&models.SolarSystem{}, &models.Planet{}, &models.DayForecast{})
+	db.AutoMigrate(&models.SolarSystem{}, &models.Planet{}, &models.DayForecast{}, &models.User{})
 	db.Model(&models.DayForecast{}).AddForeignKey("solar_system_id", "solar_systems(id)", "RESTRICT", "RESTRICT")
 	db.Model(&models.Planet{}).AddForeignKey("solar_system_id", "solar_systems(id)", "RESTRICT", "RESTRICT")
 

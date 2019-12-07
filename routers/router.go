@@ -3,12 +3,12 @@ package routers
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/sample-full-api/controllers"
+	_ "github.com/sample-full-api/docs"
+	"github.com/sample-full-api/middlewares"
 	"github.com/sample-full-api/services"
 	"github.com/sample-full-api/utils"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-
-	_ "github.com/sample-full-api/docs"
 )
 
 func InitializeRoutes(engine *gin.Engine, deps utils.Dependencies) {
@@ -24,21 +24,27 @@ func InitializeRoutes(engine *gin.Engine, deps utils.Dependencies) {
 		},
 	}
 
-	group := engine.Group("/forecast")
+	authController := controllers.AuthenticationController{
+		AuthServiceFactory: func() controllers.AuthenticationService {
+			return controllers.NewAuthenticationService(deps)
+		},
+	}
 
-	group.GET("/health", healthController.HealthCheck)
+	forecastGroup := engine.Group("/forecast")
+	forecastGroup.Use(middlewares.VerifyToken())
+	forecastGroup.GET("/health", healthController.HealthCheck)
+	forecastGroup.POST("/planets", planetController.AddPlanet)
+	forecastGroup.GET("/planets", planetController.GetPlanets)
+	forecastGroup.POST("/solar_systems", planetController.AddSolarSystem)
+	forecastGroup.GET("/solar_systems", planetController.GetSolarSystems)
+	forecastGroup.POST("/solar_systems/:id/generate_forecasts", planetController.GenerateForecasts)
+	forecastGroup.GET("/solar_systems/:id/obtain_forecasts", planetController.ObtainForecast)
+	forecastGroup.DELETE("/all/soft", planetController.SoftDelete)
+	forecastGroup.DELETE("/all/hard", planetController.HardDelete)
 
-	group.POST("/planets", planetController.AddPlanet)
-	group.GET("/planets", planetController.GetPlanets)
+	authGroup := engine.Group("/authentication")
+	authGroup.POST("/login", authController.Login)
 
-	group.POST("/solar_systems", planetController.AddSolarSystem)
-	group.GET("/solar_systems", planetController.GetSolarSystems)
+	forecastGroup.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	group.POST("/solar_systems/:id/generate_forecasts", planetController.GenerateForecasts)
-	group.GET("/solar_systems/:id/obtain_forecasts", planetController.ObtainForecast)
-
-	group.DELETE("/all/soft", planetController.SoftDelete)
-	group.DELETE("/all/hard", planetController.HardDelete)
-
-	group.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 }

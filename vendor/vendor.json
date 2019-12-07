@@ -33,6 +33,12 @@
 			"revisionTime": "2019-07-18T01:26:54Z"
 		},
 		{
+			"checksumSHA1": "BQ8jKN4AwJt4jMztNqaxFcwyhb4=",
+			"path": "github.com/appleboy/gin-jwt",
+			"revision": "a48384942ee497c4bbe5b70130575fcd5ee47f96",
+			"revisionTime": "2019-11-20T13:09:10Z"
+		},
+		{
 			"checksumSHA1": "H0bPshte+4KAKnpIVtq1Q+GaurY=",
 			"path": "github.com/cpuguy83/go-md2man/md2man",
 			"revision": "eda4fa589184806b8720ea3b9146491209877a10",
@@ -41,6 +47,12 @@
 		{
 			"path": "github.com/cpuguy83/go-md2man/v2/md2man",
 			"revision": ""
+		},
+		{
+			"checksumSHA1": "0cytTxS0qPVjtknc7OrfuNmxvBE=",
+			"path": "github.com/dgrijalva/jwt-go",
+			"revision": "5e25c22bd5d6de03265bbe5462dcd162f85046f6",
+			"revisionTime": "2019-06-20T18:01:02Z"
 		},
 		{
 			"checksumSHA1": "/NB9AGM1V8sJpHoVtRc47O5F9CQ=",
@@ -339,6 +351,12 @@
 			"path": "golang.org/x/tools/go/loader",
 			"revision": "ecd32218bd7f33fd31c1abbfb74283690bedd093",
 			"revisionTime": "2019-11-27T19:14:59Z"
+		},
+		{
+			"checksumSHA1": "cTnSMGWbjJkL199ESHjuQ1oZPKM=",
+			"path": "gopkg.in/go-playground/validator.v10",
+			"revision": "691a5f5f25701d0a22785c982db4f22bfac47931",
+			"revisionTime": "2019-11-17T21:24:22Z"
 		},
 		{
 			"checksumSHA1": "SG3Uv+nQ1f4loIy3tO7Az3yyn/A=",

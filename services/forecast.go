@@ -14,13 +14,13 @@ import (
 )
 
 type ForecastService interface {
-	AddPlanet(request *views.AddPlanetRequest) (*views.AddPlanetResponse, *utils.ForecastError)
-	GetPlanets() (*views.GetPlanetsResponse, *utils.ForecastError)
-	AddSolarSystem(request *views.AddSolarSystemRequest) (*views.AddSolarSystemResponse, *utils.ForecastError)
-	GetSolarSystems() (*views.GetSolarSystemsResponse, *utils.ForecastError)
+	AddPlanet(request *views.AddPlanetRequest) (*views.AddPlanetResponse, *utils.Error)
+	GetPlanets() (*views.GetPlanetsResponse, *utils.Error)
+	AddSolarSystem(request *views.AddSolarSystemRequest) (*views.AddSolarSystemResponse, *utils.Error)
+	GetSolarSystems() (*views.GetSolarSystemsResponse, *utils.Error)
 	GenerateForecasts(solarSystemId, daysAmount int) string
-	ObtainForecast(solarSystemId, day int) (*views.GetForecastResponse, *utils.ForecastError)
-	CleanData(softDelete bool) (*views.CleanDataResponse, *utils.ForecastError)
+	ObtainForecast(solarSystemId, day int) (*views.GetForecastResponse, *utils.Error)
+	CleanData(softDelete bool) (*views.CleanDataResponse, *utils.Error)
 }
 
 type forecastService struct {
@@ -35,7 +35,7 @@ func NewPlanetService(deps utils.Dependencies) *forecastService {
 	}
 }
 
-func (p *forecastService) AddPlanet(request *views.AddPlanetRequest) (*views.AddPlanetResponse, *utils.ForecastError) {
+func (p *forecastService) AddPlanet(request *views.AddPlanetRequest) (*views.AddPlanetResponse, *utils.Error) {
 	planet, err := p.buildPlanet(request)
 	if err != nil {
 		p.logger.Error(err)
@@ -59,7 +59,7 @@ func (p *forecastService) AddPlanet(request *views.AddPlanetRequest) (*views.Add
 	}, nil
 }
 
-func (p *forecastService) GetPlanets() (*views.GetPlanetsResponse, *utils.ForecastError) {
+func (p *forecastService) GetPlanets() (*views.GetPlanetsResponse, *utils.Error) {
 	var planets []models.Planet
 	if err := p.db.Find(&planets).Error; err != nil {
 		p.logger.Error(err)
@@ -84,7 +84,7 @@ func (p *forecastService) GetPlanets() (*views.GetPlanetsResponse, *utils.Foreca
 	return &views.GetPlanetsResponse{Planets: planetsResponse}, nil
 }
 
-func (p *forecastService) AddSolarSystem(request *views.AddSolarSystemRequest) (*views.AddSolarSystemResponse, *utils.ForecastError) {
+func (p *forecastService) AddSolarSystem(request *views.AddSolarSystemRequest) (*views.AddSolarSystemResponse, *utils.Error) {
 	solarSystem, err := p.buildSolarSystem(request)
 	if err != nil {
 		p.logger.Error(err)
@@ -99,7 +99,7 @@ func (p *forecastService) AddSolarSystem(request *views.AddSolarSystemRequest) (
 	return &views.AddSolarSystemResponse{Name: solarSystem.Name}, nil
 }
 
-func (p *forecastService) GetSolarSystems() (*views.GetSolarSystemsResponse, *utils.ForecastError) {
+func (p *forecastService) GetSolarSystems() (*views.GetSolarSystemsResponse, *utils.Error) {
 	var systems []models.SolarSystem
 	if err := p.db.Find(&systems).Error; err != nil {
 		p.logger.Error(err)
@@ -128,7 +128,7 @@ func (p *forecastService) GenerateForecasts(solarSystemId, daysAmount int) strin
 	return fmt.Sprintf("job triggered for system %d", solarSystemId)
 }
 
-func (p *forecastService) ObtainForecast(solarSystemId, day int) (*views.GetForecastResponse, *utils.ForecastError) {
+func (p *forecastService) ObtainForecast(solarSystemId, day int) (*views.GetForecastResponse, *utils.Error) {
 	var forecast models.DayForecast
 	if err := p.db.Where(&models.DayForecast{
 		Day:           day,
@@ -148,7 +148,7 @@ func (p *forecastService) ObtainForecast(solarSystemId, day int) (*views.GetFore
 	}, nil
 }
 
-func (p *forecastService) CleanData(softDelete bool) (*views.CleanDataResponse, *utils.ForecastError) {
+func (p *forecastService) CleanData(softDelete bool) (*views.CleanDataResponse, *utils.Error) {
 	if softDelete {
 		if err := p.transactionalSoftDelete(); err != nil {
 			p.logger.Error(err)
@@ -166,7 +166,7 @@ func (p *forecastService) CleanData(softDelete bool) (*views.CleanDataResponse, 
 	return &views.CleanDataResponse{Message: "hard delete performed successfully"}, nil
 }
 
-func (p *forecastService) transactionalSoftDelete() *utils.ForecastError {
+func (p *forecastService) transactionalSoftDelete() *utils.Error {
 	tx := p.db.Begin()
 	defer func() {
 		if r := recover(); r != nil {
@@ -205,7 +205,7 @@ func (p *forecastService) transactionalSoftDelete() *utils.ForecastError {
 	return nil
 }
 
-func (p *forecastService) transactionalHardDelete() *utils.ForecastError {
+func (p *forecastService) transactionalHardDelete() *utils.Error {
 	tx := p.db.Begin()
 	defer func() {
 		if r := recover(); r != nil {
@@ -244,13 +244,13 @@ func (p *forecastService) transactionalHardDelete() *utils.ForecastError {
 	return nil
 }
 
-func (p *forecastService) buildSolarSystem(req *views.AddSolarSystemRequest) (*models.SolarSystem, *utils.ForecastError) {
+func (p *forecastService) buildSolarSystem(req *views.AddSolarSystemRequest) (*models.SolarSystem, *utils.Error) {
 	return &models.SolarSystem{
 		Name: req.Name,
 	}, nil
 }
 
-func (p *forecastService) buildPlanet(req *views.AddPlanetRequest) (*models.Planet, *utils.ForecastError) {
+func (p *forecastService) buildPlanet(req *views.AddPlanetRequest) (*models.Planet, *utils.Error) {
 	var solarSystem models.SolarSystem
 	if err := p.db.Where(&models.SolarSystem{
 		Name: req.SolarSystemName,
@@ -281,7 +281,7 @@ func (p *forecastService) buildPlanet(req *views.AddPlanetRequest) (*models.Plan
 }
 
 // goroutine
-func (p *forecastService) generateForecast(solarSystemId, daysAmount int) *utils.ForecastError {
+func (p *forecastService) generateForecast(solarSystemId, daysAmount int) *utils.Error {
 	p.logger.Infof("generating forecast for system %d for %d days\n", solarSystemId, daysAmount)
 
 	if err := p.cleanUpExistingForecasts(solarSystemId); err != nil {
@@ -327,7 +327,7 @@ func (p *forecastService) generateForecast(solarSystemId, daysAmount int) *utils
 	return nil
 }
 
-func (p *forecastService) cleanUpExistingForecasts(solarSystemId int) *utils.ForecastError {
+func (p *forecastService) cleanUpExistingForecasts(solarSystemId int) *utils.Error {
 	if err := p.db.Where(&models.DayForecast{
 		SolarSystemID: uint(solarSystemId),
 	}).Delete(&models.DayForecast{}).Error; err != nil {

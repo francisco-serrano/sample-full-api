@@ -5,43 +5,51 @@ import (
 	"net/http"
 )
 
-type ForecastError struct {
+type Error struct {
 	Code        string `json:"code"`
 	Description string `json:"description"`
 }
 
 const (
 	ErrInvalidData         = "err_invalid_data"
+	ErrUnauthorized        = "err_unauthorized"
 	ErrNotFound            = "err_not_found"
 	ErrInternalServerError = "err_internal_server_error"
 )
 
-func (e *ForecastError) Error() string {
+func (e *Error) Error() string {
 	return fmt.Sprintf("[%d][%s]:%s", GetStatusErrorCode(e), e.Code, e.Description)
 }
 
-func ErrorInvalid(description string) *ForecastError {
-	return &ForecastError{
+func ErrorInvalid(description string) *Error {
+	return &Error{
 		Code:        ErrInvalidData,
 		Description: description,
 	}
 }
 
-func ErrorNotFound(description string) *ForecastError {
-	return &ForecastError{
+func ErrorUnauthorized(description string) *Error {
+	return &Error{
+		Code:        ErrUnauthorized,
+		Description: description,
+	}
+}
+
+func ErrorNotFound(description string) *Error {
+	return &Error{
 		Code:        ErrNotFound,
 		Description: description,
 	}
 }
 
-func ErrorInternal(description string) *ForecastError {
-	return &ForecastError{
+func ErrorInternal(description string) *Error {
+	return &Error{
 		Code:        ErrInternalServerError,
 		Description: description,
 	}
 }
 
-func GetStatusErrorCode(error *ForecastError) int {
+func GetStatusErrorCode(error *Error) int {
 	switch error.Code {
 	case ErrInvalidData:
 		return http.StatusBadRequest
