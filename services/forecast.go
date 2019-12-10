@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"fmt"
+	"github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 	"github.com/sample-full-api/models"
 	"github.com/sample-full-api/utils"
@@ -44,7 +45,11 @@ func (p *forecastService) AddPlanet(request *views.AddPlanetRequest) (*views.Add
 
 	if err := p.db.Create(planet).Error; err != nil {
 		p.logger.Error(err)
-		return nil, utils.ErrorInternal(err.Error())
+		if err, ok := err.(*mysql.MySQLError); ok && err != nil && err.Number == 1062 {
+			return nil, utils.ErrorInvalid("unable to add planet")
+		}
+
+		return nil, utils.ErrorInternal("internal server error")
 	}
 
 	return &views.AddPlanetResponse{
@@ -93,7 +98,11 @@ func (p *forecastService) AddSolarSystem(request *views.AddSolarSystemRequest) (
 
 	if err := p.db.Create(solarSystem).Error; err != nil {
 		p.logger.Error(err)
-		return nil, utils.ErrorInternal("unable to add solar system")
+		if err, ok := err.(*mysql.MySQLError); ok && err != nil && err.Number == 1062 {
+			return nil, utils.ErrorInvalid("unable to add solar system")
+		}
+
+		return nil, utils.ErrorInternal("internal server error")
 	}
 
 	return &views.AddSolarSystemResponse{Name: solarSystem.Name}, nil
