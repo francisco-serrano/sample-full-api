@@ -25,8 +25,8 @@ func InitializeRoutes(engine *gin.Engine, deps utils.Dependencies) {
 	}
 
 	authController := controllers.AuthenticationController{
-		AuthServiceFactory: func() controllers.AuthenticationService {
-			return controllers.NewAuthenticationService(deps)
+		AuthServiceFactory: func() services.AuthenticationService {
+			return services.NewAuthenticationService(deps)
 		},
 	}
 
