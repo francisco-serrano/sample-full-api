@@ -94,7 +94,7 @@ func (f *ForecastController) GetPlanets(ctx *gin.Context) {
 // @Success 201 {object} views.BaseResponse
 // @Failure 400 {object} views.BaseResponse
 // @Failure 500 {object} views.BaseResponse
-// @Router /forecast/solar_systems/:id/generate_forecasts [post]
+// @Router /forecast/solar_systems/{id}/generate_forecasts [post]
 func (f *ForecastController) GenerateForecasts(ctx *gin.Context) {
 	solarSystemId, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
@@ -118,7 +118,7 @@ func (f *ForecastController) GenerateForecasts(ctx *gin.Context) {
 // @Success 201 {object} views.BaseResponse
 // @Failure 400 {object} views.BaseResponse
 // @Failure 500 {object} views.BaseResponse
-// @Router solar_systems/:id/obtain_forecasts [get]
+// @Router /forecast/solar_systems/{id}/obtain_forecasts [get]
 func (f *ForecastController) ObtainForecast(ctx *gin.Context) {
 	solarSystemId, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {

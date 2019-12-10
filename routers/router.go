@@ -31,8 +31,10 @@ func InitializeRoutes(engine *gin.Engine, deps utils.Dependencies) {
 	}
 
 	forecastGroup := engine.Group("/forecast")
-	forecastGroup.Use(middlewares.VerifyToken())
 	forecastGroup.GET("/health", healthController.HealthCheck)
+	forecastGroup.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	forecastGroup.Use(middlewares.VerifyToken())
 	forecastGroup.POST("/planets", planetController.AddPlanet)
 	forecastGroup.GET("/planets", planetController.GetPlanets)
 	forecastGroup.POST("/solar_systems", planetController.AddSolarSystem)
@@ -44,7 +46,4 @@ func InitializeRoutes(engine *gin.Engine, deps utils.Dependencies) {
 
 	authGroup := engine.Group("/authentication")
 	authGroup.POST("/login", authController.Login)
-
-	forecastGroup.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-
 }

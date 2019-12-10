@@ -17,6 +17,12 @@ type AuthenticationController struct {
 	AuthServiceFactory func() AuthenticationService
 }
 
+// Login
+// @Description Obtains token for application use
+// @Success 200 {object} views.BaseResponse
+// @Failure 400 {object} views.BaseResponse
+// @Failure 401 {object} views.BaseResponse
+// @Router /authentication/login [post]
 func (a *AuthenticationController) Login(ctx *gin.Context) {
 	var request LoginRequest
 	if err := ctx.ShouldBindJSON(&request); err != nil {
@@ -90,7 +96,7 @@ func (a *authenticationService) generateToken() (string, error) {
 		ExpiresAt: expirationTime.Unix(),
 	}
 
-	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte("my-key"))
+	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte("environment-var"))
 	if err != nil {
 		return "", err
 	}

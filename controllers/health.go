@@ -15,6 +15,7 @@ type HealthController struct {
 // @Description Performs Health Check
 // @Success 201 {object} views.BaseResponse
 // @Failure 503 {object} views.BaseResponse
+// @Router /forecast/health [get]
 func (f *HealthController) HealthCheck(ctx *gin.Context) {
 	result, errs := f.ServiceFactory().HealthCheck()
 	if len(errs) != 0 {

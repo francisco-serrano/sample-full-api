@@ -17,9 +17,9 @@ func VerifyToken() gin.HandlerFunc {
 		claims := jwt.StandardClaims{}
 
 		if _, err := jwt.ParseWithClaims(token, &claims, func(token *jwt.Token) (interface{}, error) {
-			return []byte("my-key"), nil
+			return []byte("environment-var"), nil
 		}); err != nil {
-			utils.SetResponse(ctx, http.StatusUnauthorized, err)
+			utils.SetResponse(ctx, http.StatusUnauthorized, "invalid token")
 
 			ctx.Abort()
 			return
